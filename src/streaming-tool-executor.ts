@@ -1,7 +1,7 @@
 /**
  * streaming-tool-executor.ts — Execute tools while the model is still streaming.
  *
- * Ported from Claude Code's StreamingToolExecutor.ts (~531 lines → ~200 lines).
+ * Ported from codenano's StreamingToolExecutor.ts (~531 lines → ~200 lines).
  * The key insight: when a tool_use content block finishes (content_block_stop),
  * its input JSON is complete even though the model may still be streaming more
  * blocks. We can start executing that tool immediately.

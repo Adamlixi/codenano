@@ -1,7 +1,7 @@
 /**
  * Environment section — Runtime environment context.
  *
- * Mirrors Claude Code's computeSimpleEnvInfo().
+ * Mirrors codenano's computeSimpleEnvInfo().
  * Injects working directory, platform, model info, etc.
  */
 

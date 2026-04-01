@@ -1,7 +1,7 @@
 /**
  * TodoWriteTool — Manage session task checklist (V1 legacy).
  *
- * Extracted from Claude Code: src/tools/TodoWriteTool/TodoWriteTool.ts
+ * Extracted from codenano: src/tools/TodoWriteTool/TodoWriteTool.ts
  */
 
 import { z } from 'zod'

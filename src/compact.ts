@@ -1,12 +1,12 @@
 /**
  * compact.ts — Auto-compact and token management
  *
- * Ports the auto-compaction logic from Claude Code's:
+ * Ports the auto-compaction logic from codenano's:
  *   - src/services/compact/autoCompact.ts  (thresholds, shouldAutoCompact)
  *   - src/services/compact/prompt.ts       (compact prompt, summary formatting)
  *   - src/utils/tokens.ts                  (tokenCountWithEstimation)
  *
- * Key constants from Claude Code:
+ * Key constants from codenano:
  *   AUTOCOMPACT_BUFFER_TOKENS = 13_000
  *   getEffectiveContextWindowSize = contextWindow - min(maxOutputTokens, 20_000)
  *   getAutoCompactThreshold = effectiveWindow - 13_000
@@ -30,7 +30,7 @@ const DEFAULT_CONTEXT_WINDOW = 200_000
 /**
  * Estimate token count for messages.
  *
- * Strategy (mirrors Claude Code's tokenCountWithEstimation):
+ * Strategy (mirrors codenano's tokenCountWithEstimation):
  * 1. If lastUsage is provided (from most recent API response), use it as a base
  *    and add rough estimate for messages that came after
  * 2. Otherwise, rough estimate entire conversation: serialized chars / 4
@@ -105,7 +105,7 @@ export function shouldAutoCompact(
 // ─── Compact Prompt ──────────────────────────────────────────────────────────
 
 /**
- * The compaction prompt — mirrors BASE_COMPACT_PROMPT from Claude Code.
+ * The compaction prompt — mirrors BASE_COMPACT_PROMPT from codenano.
  *
  * Asks the model to produce a structured summary of the conversation,
  * covering 9 sections that preserve enough context to resume work.
@@ -178,7 +178,7 @@ function formatCompactSummary(text: string): string {
 
 /**
  * Build the "session continuation" user message injected after compaction.
- * Mirrors getCompactUserSummaryMessage() in Claude Code.
+ * Mirrors getCompactUserSummaryMessage() in codenano.
  */
 function buildContinuationMessage(summary: string): string {
   return `This session is being continued from a previous conversation that was compacted to save context space. The summary below covers the earlier portion of the conversation.

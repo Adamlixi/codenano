@@ -1,7 +1,7 @@
 /**
  * instructions.ts — CLAUDE.md project instruction loading
  *
- * Simplified port of Claude Code's CLAUDE.md discovery and loading system.
+ * Simplified port of codenano's CLAUDE.md discovery and loading system.
  * Original: src/utils/claudemd.ts (1480 lines) — we extract the core logic.
  *
  * Discovery order (lowest to highest priority):

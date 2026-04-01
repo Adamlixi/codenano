@@ -1,7 +1,7 @@
 /**
  * Output efficiency section — Conciseness and communication guidelines.
  *
- * Mirrors Claude Code's getOutputEfficiencySection().
+ * Mirrors codenano's getOutputEfficiencySection().
  */
 
 /** Build the "Output efficiency" section */

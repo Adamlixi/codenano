@@ -2,7 +2,7 @@
  * Custom sections — Developer-defined prompt sections.
  *
  * Allows SDK users to inject arbitrary sections into the prompt,
- * similar to how Claude Code injects MCP instructions, scratchpad
+ * similar to how codenano injects MCP instructions, scratchpad
  * instructions, memory, etc.
  */
 
@@ -21,7 +21,7 @@ export function customSection(title: string, content: string): string {
  * Build a "Function Result Clearing" section (if applicable).
  * Informs the model that old tool results may be cleared from context.
  *
- * Mirrors Claude Code's getFunctionResultClearingSection().
+ * Mirrors codenano's getFunctionResultClearingSection().
  *
  * @param keepRecent — Number of recent results to keep
  */
@@ -35,7 +35,7 @@ Old tool results will be automatically cleared from context to free up space. Th
 
 /**
  * Standard reminder about preserving important information from tool results.
- * Mirrors Claude Code's SUMMARIZE_TOOL_RESULTS_SECTION.
+ * Mirrors codenano's SUMMARIZE_TOOL_RESULTS_SECTION.
  */
 export const SUMMARIZE_TOOL_RESULTS_SECTION =
   `When working with tool results, write down any important information you might need later in your response, as the original tool result may be cleared later.`

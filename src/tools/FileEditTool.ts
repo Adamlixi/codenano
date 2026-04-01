@@ -1,7 +1,7 @@
 /**
  * FileEditTool — Perform exact string replacements in files.
  *
- * Extracted from Claude Code: src/tools/FileEditTool/FileEditTool.ts
+ * Extracted from codenano: src/tools/FileEditTool/FileEditTool.ts
  */
 
 import { z } from 'zod'

@@ -1,7 +1,7 @@
 /**
  * Actions section — Guidance for executing actions with care.
  *
- * Mirrors Claude Code's getActionsSection().
+ * Mirrors codenano's getActionsSection().
  * Covers reversibility, blast radius, and confirmation for risky operations.
  */
 

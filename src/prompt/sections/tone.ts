@@ -1,7 +1,7 @@
 /**
  * Tone and style section — Communication guidelines.
  *
- * Mirrors Claude Code's getSimpleToneAndStyleSection().
+ * Mirrors codenano's getSimpleToneAndStyleSection().
  */
 
 import { prependBullets } from '../utils.js'

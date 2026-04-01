@@ -1,7 +1,7 @@
 /**
  * SkillTool — Invoke saved skills (slash commands).
  *
- * Extracted from Claude Code: src/tools/SkillTool/SkillTool.ts
+ * Extracted from codenano: src/tools/SkillTool/SkillTool.ts
  *
  * This is a schema-only stub. The actual implementation requires a
  * skill registry. SDK users should provide their own skill loader.

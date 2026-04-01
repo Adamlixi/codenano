@@ -1,7 +1,7 @@
 /**
  * System section — Tool execution model and permission framework.
  *
- * Mirrors Claude Code's getSimpleSystemSection().
+ * Mirrors codenano's getSimpleSystemSection().
  * Explains how tools work, permissions, system reminders, and hooks.
  */
 

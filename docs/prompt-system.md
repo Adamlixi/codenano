@@ -1,6 +1,6 @@
 # System Prompt Architecture
 
-The prompt system is faithfully reproduced from Claude Code's internal architecture. It composes a system prompt from independent, cacheable sections.
+The prompt system is faithfully reproduced from codenano's internal architecture. It composes a system prompt from independent, cacheable sections.
 
 ## Section Layout
 

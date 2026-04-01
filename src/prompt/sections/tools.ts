@@ -1,7 +1,7 @@
 /**
  * Tools section — Guidance for using available tools.
  *
- * Mirrors Claude Code's getUsingYourToolsSection().
+ * Mirrors codenano's getUsingYourToolsSection().
  * Generates tool usage instructions based on which tools are available.
  */
 

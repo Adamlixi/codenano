@@ -1,7 +1,7 @@
 /**
  * tool-budget.ts — Tool result size budgeting
  *
- * Simplified port of Claude Code's tool result budgeting system.
+ * Simplified port of codenano's tool result budgeting system.
  * Original: src/utils/toolResultStorage.ts (1500+ lines, 2-tier system with disk persistence)
  *
  * SDK simplification:
@@ -10,7 +10,7 @@
  *   - Per-message aggregate cap at MAX_RESULTS_PER_MESSAGE_CHARS (200KB)
  *   - Preview: first 2KB of truncated content
  *
- * Claude Code constants preserved:
+ * codenano constants preserved:
  *   DEFAULT_MAX_RESULT_SIZE_CHARS = 50_000
  *   MAX_TOOL_RESULTS_PER_MESSAGE_CHARS = 200_000
  *   PREVIEW_SIZE_BYTES = 2_000
@@ -128,7 +128,7 @@ export function applyMessageBudget(
 
 /**
  * Generate a preview of content, cutting at the nearest newline.
- * Mirrors Claude Code's generatePreview() in toolResultStorage.ts.
+ * Mirrors codenano's generatePreview() in toolResultStorage.ts.
  */
 function generatePreview(content: string, maxBytes: number): string {
   if (content.length <= maxBytes) return content

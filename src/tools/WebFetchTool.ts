@@ -1,7 +1,7 @@
 /**
  * WebFetchTool — Fetch and extract content from a URL.
  *
- * Extracted from Claude Code: src/tools/WebFetchTool/WebFetchTool.ts
+ * Extracted from codenano: src/tools/WebFetchTool/WebFetchTool.ts
  */
 
 import { z } from 'zod'

@@ -1,7 +1,7 @@
 /**
  * prompt/builder.ts — System prompt assembly and priority resolution.
  *
- * Mirrors Claude Code's architecture:
+ * Mirrors codenano's architecture:
  * - getSystemPrompt() → builds sections array from config
  * - buildEffectiveSystemPrompt() → applies priority chain
  *
@@ -70,7 +70,7 @@ export interface PromptConfig {
 /**
  * Build a complete system prompt from configuration.
  *
- * Mirrors Claude Code's getSystemPrompt() architecture:
+ * Mirrors codenano's getSystemPrompt() architecture:
  * - Static sections (before boundary) are cross-org cacheable
  * - Dynamic sections (after boundary) are session-specific
  *
@@ -179,7 +179,7 @@ export interface EffectivePromptOptions {
  * 3. Default — standard prompt from sections
  * 4. Append — always added at end
  *
- * Mirrors Claude Code's buildEffectiveSystemPrompt().
+ * Mirrors codenano's buildEffectiveSystemPrompt().
  */
 export function buildEffectiveSystemPrompt(
   options: EffectivePromptOptions,
@@ -242,7 +242,7 @@ export function simplePrompt(prompt: string): SystemPrompt {
  * Enhance an existing system prompt with environment details.
  * Useful for subagent prompts that need env context.
  *
- * Mirrors Claude Code's enhanceSystemPromptWithEnvDetails().
+ * Mirrors codenano's enhanceSystemPromptWithEnvDetails().
  */
 export function enhancePromptWithEnv(
   existingPrompt: string[],

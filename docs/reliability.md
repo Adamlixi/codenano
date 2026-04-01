@@ -4,7 +4,7 @@
 
 When the conversation approaches the context window limit, the agent automatically summarizes the history using an LLM call, then replaces messages with a compact continuation.
 
-**Thresholds** (matching Claude Code constants):
+**Thresholds** (matching codenano constants):
 - Context window: 200K tokens (all Claude models)
 - Effective window: contextWindow - min(maxOutputTokens, 20K)
 - Compact threshold: effectiveWindow - 13K buffer
@@ -75,7 +75,7 @@ const agent = createAgent({
 
 Tool results are automatically truncated to prevent context bloat:
 
-- **Per-tool cap**: 50KB (matching Claude Code's `DEFAULT_MAX_RESULT_SIZE_CHARS`)
+- **Per-tool cap**: 50KB (matching codenano's `DEFAULT_MAX_RESULT_SIZE_CHARS`)
 - **Per-message cap**: 200KB aggregate across all tool results in one message
 - **Preview**: First 2KB of truncated content, cut at nearest newline
 

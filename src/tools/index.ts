@@ -1,5 +1,5 @@
 /**
- * tools/index.ts — Barrel export for all extracted Claude Code tools.
+ * tools/index.ts — Barrel export for all extracted codenano tools.
  *
  * Tools are organized into three tiers:
  *

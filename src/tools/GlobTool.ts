@@ -1,7 +1,7 @@
 /**
  * GlobTool — Fast file pattern matching.
  *
- * Extracted from Claude Code: src/tools/GlobTool/GlobTool.ts
+ * Extracted from codenano: src/tools/GlobTool/GlobTool.ts
  */
 
 import { z } from 'zod'

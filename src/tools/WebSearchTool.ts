@@ -1,9 +1,9 @@
 /**
  * WebSearchTool — Search the web.
  *
- * Extracted from Claude Code: src/tools/WebSearchTool/WebSearchTool.ts
+ * Extracted from codenano: src/tools/WebSearchTool/WebSearchTool.ts
  *
- * Note: This is a stub implementation. In Claude Code, web search uses
+ * Note: This is a stub implementation. In codenano, web search uses
  * Anthropic's server-side web search API. SDK users should provide their
  * own search backend (e.g. Brave, Serper, Tavily) via the execute function.
  */

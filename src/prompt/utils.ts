@@ -1,14 +1,14 @@
 /**
  * prompt/utils.ts — Shared prompt formatting utilities.
  *
- * Mirrors Claude Code's prependBullets() and other prompt helpers.
+ * Mirrors codenano's prependBullets() and other prompt helpers.
  */
 
 /**
  * Format items as a bulleted list with nested sub-items.
  * String items get a top-level bullet; string[] items get indented sub-bullets.
  *
- * Mirrors Claude Code's prependBullets().
+ * Mirrors codenano's prependBullets().
  */
 export function prependBullets(items: Array<string | string[]>): string[] {
   return items.flatMap(item =>

@@ -1,7 +1,7 @@
 /**
  * AskUserQuestionTool — Prompt the user with questions.
  *
- * Extracted from Claude Code: src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx
+ * Extracted from codenano: src/tools/AskUserQuestionTool/AskUserQuestionTool.tsx
  *
  * This is a schema-only stub. The actual implementation requires a UI
  * layer to display questions and collect answers. SDK users should

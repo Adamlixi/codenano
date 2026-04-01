@@ -1,7 +1,7 @@
 /**
  * prompt/sections.ts — Section caching and resolution
  *
- * Mirrors Claude Code's systemPromptSections.ts:
+ * Mirrors codenano's systemPromptSections.ts:
  * - systemPromptSection() — memoized section (cached until clear)
  * - uncachedSection() — volatile section (recomputes every turn)
  * - resolveSections() — parallel resolution of all sections

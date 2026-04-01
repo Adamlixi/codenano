@@ -66,7 +66,7 @@ export interface AgentConfig {
    *
    * When enabled, the agent will summarize the conversation history before
    * the next model call if the estimated token count exceeds the threshold
-   * (context window - 13k buffer). Mirrors Claude Code's auto-compact behavior.
+   * (context window - 13k buffer). Mirrors codenano's auto-compact behavior.
    */
   autoCompact?: boolean
 
@@ -82,7 +82,7 @@ export interface AgentConfig {
    * Max output tokens recovery: number of retry attempts when the model
    * hits its output token limit (stop_reason = 'max_tokens').
    * Each retry injects a "resume" message asking the model to continue.
-   * Default: 3 (matches Claude Code's MAX_OUTPUT_TOKENS_RECOVERY_LIMIT).
+   * Default: 3 (matches codenano's MAX_OUTPUT_TOKENS_RECOVERY_LIMIT).
    * Set to 0 to disable.
    */
   maxOutputRecoveryAttempts?: number

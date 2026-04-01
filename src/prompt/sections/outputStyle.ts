@@ -1,7 +1,7 @@
 /**
  * Output style section — Custom output style injection.
  *
- * Mirrors Claude Code's getOutputStyleSection().
+ * Mirrors codenano's getOutputStyleSection().
  */
 
 import type { OutputStyleConfig } from '../types.js'

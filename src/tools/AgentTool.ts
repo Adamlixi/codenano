@@ -1,7 +1,7 @@
 /**
  * AgentTool — Spawn sub-agents for parallel or complex tasks.
  *
- * Extracted from Claude Code: src/tools/AgentTool/AgentTool.tsx
+ * Extracted from codenano: src/tools/AgentTool/AgentTool.tsx
  *
  * This is the schema definition. The actual agent spawning requires
  * integration with createAgent(). SDK users can wire this up to create

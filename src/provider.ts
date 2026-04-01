@@ -284,19 +284,19 @@ const MAX_529_RETRIES = 3
 
 /**
  * Capped default: most requests use 8K to save API slot capacity.
- * Matches Claude Code's CAPPED_DEFAULT_MAX_TOKENS.
+ * Matches codenano's CAPPED_DEFAULT_MAX_TOKENS.
  */
 export const CAPPED_DEFAULT_MAX_TOKENS = 8_000
 
 /**
  * Escalation target: retry at 64K when 8K cap is hit.
- * Matches Claude Code's ESCALATED_MAX_TOKENS.
+ * Matches codenano's ESCALATED_MAX_TOKENS.
  */
 export const ESCALATED_MAX_TOKENS = 64_000
 
 /**
  * Calculate retry delay with exponential backoff + jitter.
- * Mirrors Claude Code's getRetryDelay() in withRetry.ts.
+ * Mirrors codenano's getRetryDelay() in withRetry.ts.
  */
 export function getRetryDelay(attempt: number, maxDelay = MAX_RETRY_DELAY_MS): number {
   const baseDelay = Math.min(BASE_RETRY_DELAY_MS * Math.pow(2, attempt), maxDelay)

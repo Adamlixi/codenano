@@ -1,7 +1,7 @@
 /**
  * Language section — Response language preference.
  *
- * Mirrors Claude Code's getLanguageSection().
+ * Mirrors codenano's getLanguageSection().
  */
 
 /**

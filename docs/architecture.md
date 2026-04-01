@@ -2,7 +2,7 @@
 
 ## Agent Loop
 
-The core engine is a streaming-first `while(true)` loop where the model drives tool usage until the task is complete or a stop condition is met. This mirrors Claude Code's `queryLoop` pattern.
+The core engine is a streaming-first `while(true)` loop where the model drives tool usage until the task is complete or a stop condition is met. This mirrors codenano's `queryLoop` pattern.
 
 ```
 createAgent(config)
@@ -57,10 +57,10 @@ createAgent(config)
 
 ## Continue Paths
 
-Claude Code's `queryLoop` has 7 continue paths. The SDK implements 5:
+codenano's `queryLoop` has 7 continue paths. The SDK implements 5:
 
 ```
-Claude Code queryLoop (7 continue paths):
+codenano queryLoop (7 continue paths):
   1. next_turn              <- normal tool results          [implemented]
   2. reactive_compact_retry <- 413 -> compress -> retry     [implemented]
   3. collapse_drain_retry   <- context collapse -> retry    [missing - simplified to auto-compact]

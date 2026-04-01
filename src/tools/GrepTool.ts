@@ -1,7 +1,7 @@
 /**
  * GrepTool — Search file contents with regex (ripgrep).
  *
- * Extracted from Claude Code: src/tools/GrepTool/GrepTool.ts
+ * Extracted from codenano: src/tools/GrepTool/GrepTool.ts
  */
 
 import { z } from 'zod'

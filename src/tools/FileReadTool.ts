@@ -1,7 +1,7 @@
 /**
  * FileReadTool — Read files, images, PDFs, notebooks from disk.
  *
- * Extracted from Claude Code: src/tools/FileReadTool/FileReadTool.ts
+ * Extracted from codenano: src/tools/FileReadTool/FileReadTool.ts
  */
 
 import { z } from 'zod'

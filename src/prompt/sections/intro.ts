@@ -1,7 +1,7 @@
 /**
  * Intro section — Agent identity framing.
  *
- * Mirrors Claude Code's getSimpleIntroSection().
+ * Mirrors codenano's getSimpleIntroSection().
  * Sets the agent's role and base behavioral constraints.
  */
 
@@ -33,10 +33,10 @@ IMPORTANT: You must NEVER generate or guess URLs for the user unless you are con
 export const DEFAULT_IDENTITY =
   `You are a Claude agent, built on Anthropic's Claude Agent SDK.`
 
-/** Claude Code CLI identity */
+/** codenano CLI identity */
 export const CLAUDE_CODE_IDENTITY =
-  `You are Claude Code, Anthropic's official CLI for Claude.`
+  `You are codenano, Anthropic's official CLI for Claude.`
 
-/** Claude Code running within Agent SDK */
+/** codenano running within Agent SDK */
 export const CLAUDE_CODE_SDK_IDENTITY =
-  `You are Claude Code, Anthropic's official CLI for Claude, running within the Claude Agent SDK.`
+  `You are codenano, Anthropic's official CLI for Claude, running within the Claude Agent SDK.`

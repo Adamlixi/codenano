@@ -27,7 +27,7 @@ The SDK converts Zod schemas to JSON Schema via `zod-to-json-schema` for the Ant
 
 ## Built-in Tool Presets
 
-17 tools extracted from Claude Code, organized in three tiers:
+17 tools extracted from codenano, organized in three tiers:
 
 ```typescript
 import { createAgent, coreTools, extendedTools, allTools } from 'agent-core'

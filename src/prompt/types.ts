@@ -2,7 +2,7 @@
  * prompt/types.ts — Prompt system types
  *
  * Branded SystemPrompt type and section definitions.
- * Mirrors Claude Code's systemPromptType.ts + systemPromptSections.ts types.
+ * Mirrors codenano's systemPromptType.ts + systemPromptSections.ts types.
  */
 
 // ─── Branded SystemPrompt ──────────────────────────────────────────────────
@@ -45,7 +45,7 @@ export interface PromptSection {
 /**
  * Priority levels for system prompt assembly.
  *
- * Mirrors Claude Code's buildEffectiveSystemPrompt() priority chain:
+ * Mirrors codenano's buildEffectiveSystemPrompt() priority chain:
  *   override > agent > custom > default > append
  */
 export type PromptPriority =

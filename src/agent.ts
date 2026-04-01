@@ -2,7 +2,7 @@
  * agent.ts — Core Agent implementation
  *
  * This is the main agent loop that connects the Claude API to tool execution.
- * It implements the same while(true) pattern as Claude Code's queryLoop:
+ * It implements the same while(true) pattern as codenano's queryLoop:
  *   call model → check for tool_use → execute tools → repeat
  *
  * Phase 1 features:
@@ -86,7 +86,7 @@ interface ToolBatch {
 /**
  * Partition tool_use blocks into batches for concurrent/sequential execution.
  *
- * Ported from Claude Code's toolOrchestration.ts:partitionToolCalls().
+ * Ported from codenano's toolOrchestration.ts:partitionToolCalls().
  * Groups consecutive concurrency-safe tools into one batch; non-safe tools
  * each get their own single-item batch.
  */
@@ -250,7 +250,7 @@ class AgentImpl implements Agent {
   // ─── Agent Loop ─────────────────────────────────────────────────────
 
   /**
-   * The main agent loop — mirrors queryLoop() from Claude Code.
+   * The main agent loop — mirrors queryLoop() from codenano.
    *
    * while (true) {
    *   0. Auto-compact if approaching context limit

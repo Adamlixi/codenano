@@ -1,7 +1,7 @@
 {
-  "name": "agent-core",
+  "name": "codenano",
   "version": "0.1.0",
-  "description": "Claude Code Agent core logic — SDK for building AI coding agents",
+  "description": "codenano core logic — SDK for building AI coding agents",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

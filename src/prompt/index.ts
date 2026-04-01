@@ -1,7 +1,7 @@
 /**
  * prompt/index.ts — Public API for the prompt system.
  *
- * Architecture mirrors Claude Code:
+ * Architecture mirrors codenano:
  * - Section-based composition with static/dynamic boundary
  * - Priority-based assembly (override > agent > custom > default > append)
  * - Section caching for prompt cache optimization

@@ -1,7 +1,7 @@
 /**
  * Tasks section — Guidance for doing software engineering tasks.
  *
- * Mirrors Claude Code's getSimpleDoingTasksSection().
+ * Mirrors codenano's getSimpleDoingTasksSection().
  * Covers code quality, security, minimalism, and error handling approach.
  */
 
