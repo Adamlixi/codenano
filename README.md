@@ -6,6 +6,8 @@ Built by reverse-engineering Claude Code's production architecture. All the powe
 
 > 💡 **Based on Claude Code** — The same battle-tested engine that powers Anthropic's official coding assistant, now available as a standalone SDK.
 
+English | [简体中文](README.zh-CN.md)
+
 ## Why codenano?
 
 ### 🚀 **Claude Code's Core, 97% Lighter**
