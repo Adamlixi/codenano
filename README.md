@@ -1,21 +1,23 @@
 # codenano
 
-**The lightweight AI coding agent SDK you've been waiting for.**
+**The lightweight AI coding agent SDK extracted from Claude Code.**
 
-Build production-ready AI coding agents in minutes, not months. Extracted from Claude Code's battle-tested architecture, codenano gives you the power without the bloat.
+Built by reverse-engineering Claude Code's production architecture. All the power, none of the bloat. Open source, fully customizable, production-ready.
+
+> 💡 **Based on Claude Code** — The same battle-tested engine that powers Anthropic's official coding assistant, now available as a standalone SDK.
 
 ## Why codenano?
 
-### 🚀 **97% Smaller, 100% Powerful**
-- **5,500 lines** of focused, production-ready code
-- Claude Code: 150,000+ lines of complexity
-- Get the same capabilities, skip the overhead
+### 🚀 **Claude Code's Core, 97% Lighter**
+- **5,500 lines** of pure, focused code
+- Claude Code: 150,000+ lines (IDE integration, UI, etc.)
+- **Same agent engine, zero overhead**
 
-### ⚡ **Ship Faster**
+### ⚡ **What Claude Code Does, You Can Do**
 ```bash
 npm install codenano
 ```
-One command. Zero configuration. Start building in 60 seconds.
+Build your own Claude Code in 60 seconds. No IDE required. No restrictions.
 
 ### 🎯 **Battle-Tested Architecture**
 Extracted from Claude Code's production engine. Proven at scale, optimized for developers.
@@ -80,18 +82,66 @@ const agent = createAgent({
 
 ## codenano vs Claude Code
 
+**Same engine. Different philosophy.**
+
 | Feature | codenano | Claude Code |
 |---------|----------|-------------|
-| **Lines of Code** | 5,500 | 150,000+ |
-| **Setup Time** | < 1 minute | Hours |
-| **Learning Curve** | Minimal | Steep |
-| **Bundle Size** | Tiny | Large |
-| **Core Features** | ✅ All included | ✅ All included |
+| **Based On** | Claude Code core | Official Anthropic product |
+| **Lines of Code** | 5,500 (core only) | 150,000+ (full app) |
+| **What's Included** | Agent engine | Engine + IDE + UI |
+| **Setup Time** | < 1 minute | Install IDE extension |
+| **Use Case** | Build custom agents | Use as-is in IDE |
+| **Customizable** | ✅ Fully open | ⚠️ Closed source |
+| **Standalone** | ✅ Yes | ❌ Requires IDE |
 | **Production Ready** | ✅ Yes | ✅ Yes |
-| **Customizable** | ✅ Fully | ⚠️ Limited |
-| **Open Source** | ✅ Yes | ❌ No |
+| **Open Source** | ✅ MIT License | ❌ Proprietary |
 
-**The bottom line:** Same power, 97% less complexity.
+**Think of it this way:**
+- **Claude Code** = Complete car (engine + body + interior)
+- **codenano** = Just the engine (build your own car)
+
+**When to use codenano:**
+- Building custom AI coding tools
+- Integrating agents into your product
+- Need full control over behavior
+- Want to understand how it works
+
+**When to use Claude Code:**
+- Just want to code with AI assistance
+- Prefer official Anthropic support
+- Happy with IDE integration
+
+---
+
+## How It Works
+
+**codenano extracts Claude Code's agent loop:**
+
+```
+1. User sends message
+2. Agent calls Claude API with tools
+3. Claude decides: respond or use tool
+4. If tool use → execute → send result back
+5. Repeat until done
+```
+
+**What we extracted from Claude Code:**
+- ✅ Agent loop logic
+- ✅ Tool execution system
+- ✅ Streaming support
+- ✅ Multi-turn sessions
+- ✅ Auto-compact (context management)
+- ✅ Permission system
+- ✅ Retry & fallback
+
+**What we left out:**
+- ❌ IDE integration
+- ❌ UI components
+- ❌ File watchers
+- ❌ Git UI
+- ❌ Desktop app shell
+
+**Result:** Pure agent engine, ready to embed anywhere.
 
 ---
 
