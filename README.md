@@ -1,4 +1,4 @@
-# agent-core
+# codenano
 
 SDK for building AI coding agents, extracted from Claude Code's core architecture (~5,500 lines vs ~150,000+).
 
