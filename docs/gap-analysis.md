@@ -1,6 +1,6 @@
-# Gap Analysis: SDK vs codenano
+# Gap Analysis: codenano vs Claude Code
 
-This SDK captures codenano's core agent loop in ~5,500 lines (vs ~150,000+).
+This codenano SDK captures Claude Code's core agent loop in ~5,500 lines (vs ~150,000+).
 
 ## What's Equivalent
 
@@ -26,7 +26,7 @@ This SDK captures codenano's core agent loop in ~5,500 lines (vs ~150,000+).
 
 ## What's Simplified (by design)
 
-| codenano | SDK | Rationale |
+| Claude Code | codenano | Rationale |
 |-------------|-----|-----------|
 | 6 permission modes + rule layers + ML classifier | Single `canUseTool` callback | SDK users implement their own policy |
 | 16 hook event types | `onTurnEnd` only | Extensibility via callbacks, not config files |
@@ -44,7 +44,7 @@ This SDK captures codenano's core agent loop in ~5,500 lines (vs ~150,000+).
 
 ### P2 -- Missing Subsystems
 
-| Gap | codenano | SDK | Impact |
+| Gap | Claude Code | codenano | Impact |
 |-----|-------------|-----|--------|
 | **Hook system** | 16 event types: PreToolUse, PostToolUse, SessionStart, etc. | `onTurnEnd` only | No extensibility points for middleware |
 | **Memory system** | Auto-extract learnings, auto-dream consolidation, 4 memory types | None | No cross-session learning |
