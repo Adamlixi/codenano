@@ -95,7 +95,6 @@ export function toolDefsToAPISchemas(tools: ToolDef[]): Anthropic.Messages.Tool[
     description: tool.description,
     input_schema: zodToJsonSchema(tool.input, {
       $refStrategy: 'none',
-      target: 'openApi3',
     }) as Anthropic.Messages.Tool['input_schema'],
   }))
 }
