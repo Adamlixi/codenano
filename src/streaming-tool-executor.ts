@@ -18,13 +18,7 @@
  */
 
 import type Anthropic from '@anthropic-ai/sdk'
-import type {
-  ToolDef,
-  AgentConfig,
-  ToolContext,
-  ToolOutput,
-  StreamEvent,
-} from './types.js'
+import type { ToolDef, AgentConfig, ToolContext, ToolOutput, StreamEvent } from './types.js'
 import type { MessageParam, ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
 import { truncateToolResult } from './tool-budget.js'
 
@@ -131,9 +125,7 @@ export class StreamingToolExecutor {
     // Wait for executing/queued tools
     while (this.hasPending()) {
       // Wait for the next tool to complete
-      const pending = this.tools.filter(
-        t => t.status === 'executing' && t.promise,
-      )
+      const pending = this.tools.filter(t => t.status === 'executing' && t.promise)
       if (pending.length > 0) {
         await Promise.race(pending.map(t => t.promise!))
       }
@@ -178,9 +170,7 @@ export class StreamingToolExecutor {
   // ─── Internal ───────────────────────────────────────────────────────
 
   private hasPending(): boolean {
-    return this.tools.some(
-      t => t.status === 'queued' || t.status === 'executing',
-    )
+    return this.tools.some(t => t.status === 'queued' || t.status === 'executing')
   }
 
   private canExecute(isConcurrencySafe: boolean): boolean {

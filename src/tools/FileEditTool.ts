@@ -12,7 +12,9 @@ import { defineTool } from '../tool-builder.js'
 const inputSchema = z.object({
   file_path: z.string().describe('The absolute path to the file to modify'),
   old_string: z.string().describe('The text to replace'),
-  new_string: z.string().describe('The text to replace it with (must be different from old_string)'),
+  new_string: z
+    .string()
+    .describe('The text to replace it with (must be different from old_string)'),
   replace_all: z
     .boolean()
     .optional()
@@ -24,7 +26,8 @@ export type FileEditInput = z.infer<typeof inputSchema>
 
 export const FileEditTool = defineTool({
   name: 'Edit',
-  description: 'Performs exact string replacements in files. The edit will FAIL if old_string is not unique in the file (unless replace_all is true).',
+  description:
+    'Performs exact string replacements in files. The edit will FAIL if old_string is not unique in the file (unless replace_all is true).',
   input: inputSchema,
 
   async execute(input) {
@@ -63,9 +66,7 @@ export const FileEditTool = defineTool({
     fs.writeFileSync(filePath, updated, 'utf-8')
 
     // Count replacements
-    const count = input.replace_all
-      ? content.split(input.old_string).length - 1
-      : 1
+    const count = input.replace_all ? content.split(input.old_string).length - 1 : 1
 
     return `Successfully edited ${filePath} (${count} replacement${count > 1 ? 's' : ''})`
   },

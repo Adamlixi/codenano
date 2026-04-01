@@ -2,11 +2,9 @@
 
 **The lightweight AI coding agent SDK extracted from Claude Code.**
 
-Built by reverse-engineering Claude Code's production architecture. All the power, none of the bloat. Open source, fully customizable, production-ready.
+Built by extracting Claude Code's production architecture. All the power, none of the bloat. Open source, fully customizable, production-ready.
 
 > 💡 **Based on Claude Code** — The same battle-tested engine that powers Anthropic's official coding assistant, now available as a standalone SDK.
-
-English | [简体中文](README.zh-CN.md)
 
 ## Why codenano?
 
@@ -115,38 +113,6 @@ const agent = createAgent({
 
 ---
 
-## How It Works
-
-**codenano extracts Claude Code's agent loop:**
-
-```
-1. User sends message
-2. Agent calls Claude API with tools
-3. Claude decides: respond or use tool
-4. If tool use → execute → send result back
-5. Repeat until done
-```
-
-**What we extracted from Claude Code:**
-- ✅ Agent loop logic
-- ✅ Tool execution system
-- ✅ Streaming support
-- ✅ Multi-turn sessions
-- ✅ Auto-compact (context management)
-- ✅ Permission system
-- ✅ Retry & fallback
-
-**What we left out:**
-- ❌ IDE integration
-- ❌ UI components
-- ❌ File watchers
-- ❌ Git UI
-- ❌ Desktop app shell
-
-**Result:** Pure agent engine, ready to embed anywhere.
-
----
-
 ## What You Get
 
 ### 🛠️ **17 Built-in Tools**
@@ -251,7 +217,7 @@ ANTHROPIC_API_KEY=sk-xxx npm run test:integration
 
 ## License
 
-Extracted from Claude Code for educational and development purposes.
+MIT License.
 
 ---
 

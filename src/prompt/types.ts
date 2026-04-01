@@ -49,11 +49,11 @@ export interface PromptSection {
  *   override > agent > custom > default > append
  */
 export type PromptPriority =
-  | 'override'   // Replaces everything (e.g. loop mode)
-  | 'agent'      // Agent-specific prompt (replaces or appends to default)
-  | 'custom'     // User-provided via --system-prompt or config
-  | 'default'    // Standard prompt built from sections
-  | 'append'     // Always added at end (unless override is set)
+  | 'override' // Replaces everything (e.g. loop mode)
+  | 'agent' // Agent-specific prompt (replaces or appends to default)
+  | 'custom' // User-provided via --system-prompt or config
+  | 'default' // Standard prompt built from sections
+  | 'append' // Always added at end (unless override is set)
 
 // ─── Environment Info ──────────────────────────────────────────────────────
 
@@ -111,5 +111,4 @@ export interface OutputStyleConfig {
  * scope: 'global' for API-level prompt caching.
  * Everything AFTER contains user/session-specific content.
  */
-export const SYSTEM_PROMPT_DYNAMIC_BOUNDARY =
-  '__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'
+export const SYSTEM_PROMPT_DYNAMIC_BOUNDARY = '__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'

@@ -10,9 +10,7 @@
  * @param language — Language name (e.g. "Chinese", "Japanese", "English")
  * @returns Section string or null if no preference
  */
-export function getLanguageSection(
-  language: string | undefined,
-): string | null {
+export function getLanguageSection(language: string | undefined): string | null {
   if (!language) return null
 
   return `# Language

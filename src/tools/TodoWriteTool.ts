@@ -29,10 +29,12 @@ export const TodoWriteTool = defineTool({
 
   async execute(input) {
     currentTodos = input.todos
-    const summary = input.todos.map(t => {
-      const icon = t.status === 'completed' ? '[x]' : t.status === 'in_progress' ? '[~]' : '[ ]'
-      return `${icon} ${t.content}`
-    }).join('\n')
+    const summary = input.todos
+      .map(t => {
+        const icon = t.status === 'completed' ? '[x]' : t.status === 'in_progress' ? '[~]' : '[ ]'
+        return `${icon} ${t.content}`
+      })
+      .join('\n')
 
     return summary || 'Todo list cleared.'
   },

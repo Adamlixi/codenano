@@ -19,12 +19,14 @@ export type SkillInput = z.infer<typeof inputSchema>
 
 export const SkillTool = defineTool({
   name: 'Skill',
-  description: 'Execute a skill within the current conversation. Skills provide specialized capabilities and domain knowledge.',
+  description:
+    'Execute a skill within the current conversation. Skills provide specialized capabilities and domain knowledge.',
   input: inputSchema,
 
   async execute(_input) {
     return {
-      content: 'SkillTool requires a skill registry. Override the execute function to connect to your skill loader.',
+      content:
+        'SkillTool requires a skill registry. Override the execute function to connect to your skill loader.',
       isError: true,
     }
   },

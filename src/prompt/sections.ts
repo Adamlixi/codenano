@@ -20,10 +20,7 @@ const sectionCache = new Map<string, string | null>()
  * Create a memoized system prompt section.
  * Computed once, then cached until clearSections() is called.
  */
-export function systemPromptSection(
-  name: string,
-  compute: SectionComputeFn,
-): PromptSection {
+export function systemPromptSection(name: string, compute: SectionComputeFn): PromptSection {
   return { name, compute, cacheBreak: false }
 }
 
@@ -49,11 +46,9 @@ export function uncachedSection(
  * Resolve all prompt sections in parallel, returning prompt strings.
  * Cached sections return their memoized value; volatile sections recompute.
  */
-export async function resolveSections(
-  sections: PromptSection[],
-): Promise<(string | null)[]> {
+export async function resolveSections(sections: PromptSection[]): Promise<(string | null)[]> {
   return Promise.all(
-    sections.map(async (section) => {
+    sections.map(async section => {
       // Return cached value for non-volatile sections
       if (!section.cacheBreak && sectionCache.has(section.name)) {
         return sectionCache.get(section.name) ?? null

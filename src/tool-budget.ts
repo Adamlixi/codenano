@@ -117,7 +117,7 @@ export function applyMessageBudget(
         ...result[entry.index],
         content: truncated,
       }
-      remaining -= (entry.size - truncated.length)
+      remaining -= entry.size - truncated.length
     }
   }
 

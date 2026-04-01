@@ -22,10 +22,7 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
-import type {
-  MessageParam,
-  ContentBlockParam,
-} from '@anthropic-ai/sdk/resources/messages.js'
+import type { MessageParam, ContentBlockParam } from '@anthropic-ai/sdk/resources/messages.js'
 import type {
   AgentConfig,
   Agent,
@@ -50,81 +47,24 @@ import {
   type ModelCallResult,
 } from './provider.js'
 import { toPublicEvent } from './events.js'
-import {
-  buildSystemPrompt,
-  buildEffectiveSystemPrompt,
-  detectEnvironment,
-} from './prompt/index.js'
-import {
-  shouldAutoCompact,
-  compactMessages,
-  isPromptTooLongError,
-} from './compact.js'
+import { buildSystemPrompt, buildEffectiveSystemPrompt, detectEnvironment } from './prompt/index.js'
+import { shouldAutoCompact, compactMessages, isPromptTooLongError } from './compact.js'
 import { loadInstructions } from './instructions.js'
-import { truncateToolResult, applyMessageBudget } from './tool-budget.js'
+import { applyMessageBudget } from './tool-budget.js'
 import { StreamingToolExecutor } from './streaming-tool-executor.js'
+import { partitionToolCalls, executeSingleTool, executeBatchConcurrently } from './tool-executor.js'
+import { snipIfNeeded } from './snip-compact.js'
+import { microcompact } from './microcompact.js'
 
 // ─── Default Configuration ──────────────────────────────────────────────────
 
 const DEFAULT_MAX_TURNS = 30
 const DEFAULT_MODEL = 'claude-sonnet-4-6'
-const MAX_TOOL_CONCURRENCY = 10
 const MAX_OUTPUT_RECOVERY_LIMIT = 3
 
 const MAX_OUTPUT_RECOVERY_MESSAGE =
   'Output token limit hit. Resume directly — no apology, no recap of what you were doing. ' +
   'Pick up mid-thought if that is where the cut happened. Break remaining work into smaller pieces.'
-
-// ─── Tool Concurrency ──────────────────────────────────────────────────────
-
-/** A batch of tool calls — either all concurrency-safe or a single sequential one */
-interface ToolBatch {
-  isConcurrencySafe: boolean
-  blocks: Anthropic.ToolUseBlock[]
-}
-
-/**
- * Partition tool_use blocks into batches for concurrent/sequential execution.
- *
- * Ported from codenano's toolOrchestration.ts:partitionToolCalls().
- * Groups consecutive concurrency-safe tools into one batch; non-safe tools
- * each get their own single-item batch.
- */
-function partitionToolCalls(
-  toolUseBlocks: Anthropic.ToolUseBlock[],
-  toolMap: Map<string, ToolDef>,
-): ToolBatch[] {
-  return toolUseBlocks.reduce<ToolBatch[]>((batches, toolUse) => {
-    const tool = toolMap.get(toolUse.name)
-
-    // Determine concurrency safety
-    let isConcurrencySafe = false
-    if (tool) {
-      const parsed = tool.input.safeParse(toolUse.input)
-      if (parsed.success) {
-        if (typeof tool.isConcurrencySafe === 'function') {
-          isConcurrencySafe = tool.isConcurrencySafe(parsed.data)
-        } else if (typeof tool.isConcurrencySafe === 'boolean') {
-          isConcurrencySafe = tool.isConcurrencySafe
-        } else if (typeof tool.isReadOnly === 'function') {
-          isConcurrencySafe = tool.isReadOnly(parsed.data)
-        } else if (typeof tool.isReadOnly === 'boolean') {
-          isConcurrencySafe = tool.isReadOnly
-        }
-      }
-    }
-
-    // Group consecutive safe tools; non-safe ones start a new batch
-    const lastBatch = batches[batches.length - 1]
-    if (isConcurrencySafe && lastBatch?.isConcurrencySafe) {
-      lastBatch.blocks.push(toolUse)
-    } else {
-      batches.push({ isConcurrencySafe, blocks: [toolUse] })
-    }
-
-    return batches
-  }, [])
-}
 
 // ─── createAgent ────────────────────────────────────────────────────────────
 
@@ -170,9 +110,7 @@ class AgentImpl implements Agent {
     this.activeModel = config.model
     this.client = createClient(config)
     this.toolSchemas = toolDefsToAPISchemas(config.tools ?? [])
-    this.toolMap = new Map(
-      (config.tools ?? []).map(t => [t.name, t]),
-    )
+    this.toolMap = new Map((config.tools ?? []).map(t => [t.name, t]))
     this.abortController = new AbortController()
   }
 
@@ -269,10 +207,7 @@ class AgentImpl implements Agent {
     existingMessages: MessageParam[],
   ): AsyncGenerator<StreamEvent, void> {
     const startTime = Date.now()
-    let messages: MessageParam[] = [
-      ...existingMessages,
-      { role: 'user', content: prompt },
-    ]
+    let messages: MessageParam[] = [...existingMessages, { role: 'user', content: prompt }]
 
     const maxTurns = this.config.maxTurns ?? DEFAULT_MAX_TURNS
     const systemPrompt = await this.getSystemPrompt()
@@ -310,6 +245,18 @@ class AgentImpl implements Agent {
 
       yield { type: 'turn_start', turnNumber: turnCount }
 
+      // ── Snip old messages (fast, zero-cost) ────────────────────────
+      const snipResult = snipIfNeeded(messages)
+      if (snipResult.snipped) {
+        messages = snipResult.messages
+      }
+
+      // ── Microcompact tool results (fast, zero-cost) ────────────────
+      const microResult = microcompact(messages)
+      if (microResult.compressed > 0) {
+        messages = microResult.messages
+      }
+
       // ── Auto-compact check ──────────────────────────────────────────
       if (this.config.autoCompact !== false && lastUsage) {
         if (shouldAutoCompact(messages, this.config, lastUsage)) {
@@ -333,19 +280,23 @@ class AgentImpl implements Agent {
       const normalizedMessages = mergeConsecutiveUserMessages(messages)
 
       // Create streaming tool executor for this turn
-      const streamingExecutor = useStreamingExecution && (this.config.tools?.length ?? 0) > 0
-        ? new StreamingToolExecutor(
-            this.toolMap,
-            this.config,
-            this.abortController.signal,
-            messages,
-            enableBudget,
-          )
-        : null
+      const streamingExecutor =
+        useStreamingExecution && (this.config.tools?.length ?? 0) > 0
+          ? new StreamingToolExecutor(
+              this.toolMap,
+              this.config,
+              this.abortController.signal,
+              messages,
+              enableBudget,
+            )
+          : null
 
       // Track completed tool_use blocks during streaming
       const completedToolBlocks: Map<number, Anthropic.ToolUseBlock> = new Map()
-      const pendingToolBlocks: Map<number, Partial<Anthropic.ToolUseBlock> & { _inputJson?: string }> = new Map()
+      const pendingToolBlocks: Map<
+        number,
+        Partial<Anthropic.ToolUseBlock> & { _inputJson?: string }
+      > = new Map()
 
       try {
         for await (const event of callModelStreamingWithRetry(
@@ -442,12 +393,18 @@ class AgentImpl implements Agent {
           turnCount-- // Retry this turn
           continue
         }
-        yield { type: 'error', error: modelError instanceof Error ? modelError : new Error(String(modelError)) }
+        yield {
+          type: 'error',
+          error: modelError instanceof Error ? modelError : new Error(String(modelError)),
+        }
         break
       }
 
       if (modelError) {
-        yield { type: 'error', error: modelError instanceof Error ? modelError : new Error(String(modelError)) }
+        yield {
+          type: 'error',
+          error: modelError instanceof Error ? modelError : new Error(String(modelError)),
+        }
         break
       }
 
@@ -586,7 +543,7 @@ class AgentImpl implements Agent {
               }
             }
 
-            const concurrencyCap = Math.min(batch.blocks.length, MAX_TOOL_CONCURRENCY)
+            const concurrencyCap = Math.min(batch.blocks.length, 10)
             const results = await executeBatchConcurrently(
               batch.blocks,
               this.toolMap,
@@ -619,9 +576,7 @@ class AgentImpl implements Agent {
       }
 
       // Apply per-message aggregate budget
-      const budgetedResults = enableBudget
-        ? applyMessageBudget(allToolResults)
-        : allToolResults
+      const budgetedResults = enableBudget ? applyMessageBudget(allToolResults) : allToolResults
 
       // Append tool results to messages
       messages.push({ role: 'user', content: budgetedResults })
@@ -641,194 +596,6 @@ class AgentImpl implements Agent {
       },
     }
   }
-}
-
-// ─── Tool Execution Helpers ────────────────────────────────────────────────
-
-interface ToolExecResult {
-  apiResult: ContentBlockParam
-  event: StreamEvent
-}
-
-interface SingleToolExecResult {
-  apiResult: ContentBlockParam
-  events: StreamEvent[]
-}
-
-/**
- * Execute a single tool — handles lookup, permission, validation, execution.
- * Applies per-tool result budget if enabled.
- */
-async function executeSingleTool(
-  toolUse: Anthropic.ToolUseBlock,
-  toolMap: Map<string, ToolDef>,
-  config: AgentConfig,
-  signal: AbortSignal,
-  messages: MessageParam[],
-  enableBudget: boolean = true,
-): Promise<SingleToolExecResult> {
-  const events: StreamEvent[] = []
-  const tool = toolMap.get(toolUse.name)
-
-  if (!tool) {
-    const content = `Error: Unknown tool "${toolUse.name}"`
-    events.push({ type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true })
-    return {
-      apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-      events,
-    }
-  }
-
-  // Permission check
-  if (config.canUseTool) {
-    const decision = await config.canUseTool(toolUse.name, toolUse.input as Record<string, unknown>)
-    if (decision.behavior === 'deny') {
-      const content = `Permission denied: ${decision.message ?? 'Tool use not allowed'}`
-      events.push({ type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true })
-      return {
-        apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-        events,
-      }
-    }
-  }
-
-  // Validate input
-  const parsed = tool.input.safeParse(toolUse.input)
-  if (!parsed.success) {
-    const content = `Input validation error: ${parsed.error.message}`
-    events.push({ type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true })
-    return {
-      apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-      events,
-    }
-  }
-
-  // Emit tool_use event
-  events.push({
-    type: 'tool_use',
-    toolName: toolUse.name,
-    toolUseId: toolUse.id,
-    input: parsed.data,
-  })
-
-  // Execute
-  try {
-    const context: ToolContext = { signal, messages }
-    const rawOutput = await tool.execute(parsed.data, context)
-    const output = normalizeToolOutput(rawOutput)
-
-    // Apply per-tool result budget
-    const budgetedContent = enableBudget
-      ? truncateToolResult(output.content)
-      : output.content
-
-    events.push({
-      type: 'tool_result',
-      toolUseId: toolUse.id,
-      output: budgetedContent,
-      isError: output.isError ?? false,
-    })
-    return {
-      apiResult: {
-        type: 'tool_result',
-        tool_use_id: toolUse.id,
-        content: budgetedContent,
-        ...(output.isError && { is_error: true }),
-      } as ContentBlockParam,
-      events,
-    }
-  } catch (error) {
-    const content = `Tool execution error: ${error instanceof Error ? error.message : String(error)}`
-    events.push({ type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true })
-    return {
-      apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-      events,
-    }
-  }
-}
-
-/**
- * Execute a batch of tools concurrently with a concurrency cap.
- */
-async function executeBatchConcurrently(
-  blocks: Anthropic.ToolUseBlock[],
-  toolMap: Map<string, ToolDef>,
-  config: AgentConfig,
-  signal: AbortSignal,
-  messages: MessageParam[],
-  concurrencyCap: number,
-  enableBudget: boolean = true,
-): Promise<ToolExecResult[]> {
-  const results: ToolExecResult[] = new Array(blocks.length)
-
-  const runOne = async (idx: number): Promise<void> => {
-    const toolUse = blocks[idx]!
-    const tool = toolMap.get(toolUse.name)
-
-    if (!tool) {
-      const content = `Error: Unknown tool "${toolUse.name}"`
-      results[idx] = {
-        apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-        event: { type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true },
-      }
-      return
-    }
-
-    const parsed = tool.input.safeParse(toolUse.input)
-    if (!parsed.success) {
-      const content = `Input validation error: ${parsed.error.message}`
-      results[idx] = {
-        apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-        event: { type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true },
-      }
-      return
-    }
-
-    try {
-      const context: ToolContext = { signal, messages }
-      const rawOutput = await tool.execute(parsed.data, context)
-      const output = normalizeToolOutput(rawOutput)
-
-      // Apply per-tool result budget
-      const budgetedContent = enableBudget
-        ? truncateToolResult(output.content)
-        : output.content
-
-      results[idx] = {
-        apiResult: {
-          type: 'tool_result',
-          tool_use_id: toolUse.id,
-          content: budgetedContent,
-          ...(output.isError && { is_error: true }),
-        } as ContentBlockParam,
-        event: {
-          type: 'tool_result',
-          toolUseId: toolUse.id,
-          output: budgetedContent,
-          isError: output.isError ?? false,
-        },
-      }
-    } catch (error) {
-      const content = `Tool execution error: ${error instanceof Error ? error.message : String(error)}`
-      results[idx] = {
-        apiResult: { type: 'tool_result', tool_use_id: toolUse.id, content, is_error: true } as ContentBlockParam,
-        event: { type: 'tool_result', toolUseId: toolUse.id, output: content, isError: true },
-      }
-    }
-  }
-
-  // Batch execution with concurrency cap
-  let nextIndex = 0
-  while (nextIndex < blocks.length) {
-    const batch: Promise<void>[] = []
-    const batchSize = Math.min(concurrencyCap, blocks.length - nextIndex)
-    for (let i = 0; i < batchSize; i++) {
-      batch.push(runOne(nextIndex++))
-    }
-    await Promise.all(batch)
-  }
-
-  return results
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -851,13 +618,6 @@ function extractLastAssistantText(messages: MessageParam[]): string {
     }
   }
   return ''
-}
-
-function normalizeToolOutput(output: ToolOutput): { content: string; isError?: boolean } {
-  if (typeof output === 'string') {
-    return { content: output }
-  }
-  return output
 }
 
 function simplifyMessage(msg: MessageParam): MessageParam {

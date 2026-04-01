@@ -171,9 +171,7 @@ export type PermissionFn = (
 ) => PermissionDecision | Promise<PermissionDecision>
 
 /** Permission decision */
-export type PermissionDecision =
-  | { behavior: 'allow' }
-  | { behavior: 'deny'; message?: string }
+export type PermissionDecision = { behavior: 'allow' } | { behavior: 'deny'; message?: string }
 
 // ─── Stop Hook ──────────────────────────────────────────────────────────────
 

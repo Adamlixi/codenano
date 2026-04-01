@@ -18,7 +18,7 @@ describe('estimateTokens', () => {
       { role: 'user', content: 'Hello world' }, // 11 chars -> ~3 tokens
     ]
     const tokens = estimateTokens(messages)
-    expect(tokens).toBe(Math.ceil(11 / 4)) // 3
+    expect(tokens).toBe(Math.ceil(11 / 3.5)) // 4
   })
 
   it('handles array content with text blocks', () => {
@@ -32,7 +32,7 @@ describe('estimateTokens', () => {
       },
     ]
     const tokens = estimateTokens(messages)
-    expect(tokens).toBe(Math.ceil(12 / 4)) // 3
+    expect(tokens).toBe(Math.ceil(12 / 3.5)) // 4
   })
 
   it('handles tool_result content', () => {
@@ -45,7 +45,7 @@ describe('estimateTokens', () => {
       },
     ]
     const tokens = estimateTokens(messages)
-    expect(tokens).toBe(Math.ceil(18 / 4)) // 5
+    expect(tokens).toBe(Math.ceil(18 / 3.5)) // 6
   })
 
   it('handles tool_use blocks with JSON input', () => {
@@ -59,7 +59,8 @@ describe('estimateTokens', () => {
     ]
     const tokens = estimateTokens(messages)
     // JSON.stringify({ path: '/tmp/foo' }) = '{"path":"/tmp/foo"}' = 19 chars
-    expect(tokens).toBe(Math.ceil(19 / 4)) // 5
+    // Base: ceil(19/3.5) = 6, Tool overhead: 50, Total: 56
+    expect(tokens).toBe(Math.ceil(19 / 3.5) + 50)
   })
 
   it('returns usage-based count when lastUsage provided', () => {
@@ -93,7 +94,7 @@ describe('estimateTokens', () => {
       { role: 'user', content: 'Bye' },         // 3 chars
     ]
     const tokens = estimateTokens(messages)
-    expect(tokens).toBe(Math.ceil(16 / 4)) // 4
+    expect(tokens).toBe(Math.ceil(16 / 3.5)) // 5 tokens with improved formula
   })
 })
 

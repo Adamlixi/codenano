@@ -11,7 +11,12 @@ import { defineTool } from '../tool-builder.js'
 
 const inputSchema = z.object({
   notebook_path: z.string().describe('The absolute path to the Jupyter notebook file (.ipynb)'),
-  cell_id: z.string().optional().describe('The ID of an existing cell to edit. If not provided with insert mode, inserts at the end.'),
+  cell_id: z
+    .string()
+    .optional()
+    .describe(
+      'The ID of an existing cell to edit. If not provided with insert mode, inserts at the end.',
+    ),
   new_source: z.string().describe('The new source content for the cell'),
   cell_type: z
     .enum(['code', 'markdown'])
@@ -52,9 +57,9 @@ export const NotebookEditTool = defineTool({
 
     const mode = input.edit_mode ?? 'replace'
     const cellType = input.cell_type ?? 'code'
-    const sourceLines = input.new_source.split('\n').map((line, i, arr) =>
-      i < arr.length - 1 ? line + '\n' : line,
-    )
+    const sourceLines = input.new_source
+      .split('\n')
+      .map((line, i, arr) => (i < arr.length - 1 ? line + '\n' : line))
 
     if (mode === 'insert') {
       const newCell = {

@@ -38,8 +38,14 @@ const tasks = new Map<string, Task>()
 const taskCreateInput = z.object({
   subject: z.string().describe('A brief title for the task'),
   description: z.string().describe('What needs to be done'),
-  activeForm: z.string().optional().describe('Present continuous form of what will happen (e.g., "Running tests")'),
-  metadata: z.record(z.string(), z.unknown()).optional().describe('Arbitrary metadata to attach to the task'),
+  activeForm: z
+    .string()
+    .optional()
+    .describe('Present continuous form of what will happen (e.g., "Running tests")'),
+  metadata: z
+    .record(z.string(), z.unknown())
+    .optional()
+    .describe('Arbitrary metadata to attach to the task'),
 })
 
 export type TaskCreateInput = z.infer<typeof taskCreateInput>

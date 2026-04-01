@@ -12,12 +12,7 @@
  * 4. Custom section injection
  */
 
-import type {
-  SystemPrompt,
-  OutputStyleConfig,
-  EnvironmentInfo,
-  PromptSection,
-} from './types.js'
+import type { SystemPrompt, OutputStyleConfig, EnvironmentInfo, PromptSection } from './types.js'
 import { asSystemPrompt, SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from './types.js'
 import { systemPromptSection, uncachedSection, resolveSections } from './sections.js'
 import { getIntroSection, DEFAULT_IDENTITY } from './sections/intro.js'
@@ -84,9 +79,7 @@ export interface PromptConfig {
  * })
  * ```
  */
-export async function buildSystemPrompt(
-  config: PromptConfig,
-): Promise<SystemPrompt> {
+export async function buildSystemPrompt(config: PromptConfig): Promise<SystemPrompt> {
   const {
     identity = DEFAULT_IDENTITY,
     model,
@@ -104,9 +97,7 @@ export async function buildSystemPrompt(
     getIntroSection(identity, outputStyle),
     getSystemSection(),
     // Keep task instructions unless output style explicitly replaces them
-    outputStyle === null || outputStyle.keepCodingInstructions === true
-      ? getTasksSection()
-      : null,
+    outputStyle === null || outputStyle.keepCodingInstructions === true ? getTasksSection() : null,
     getActionsSection(),
     tools.length > 0 ? getToolsSection(tools) : null,
     getToneSection(),
@@ -115,18 +106,10 @@ export async function buildSystemPrompt(
 
   // ── Dynamic sections (session-specific, memoized) ──────────────────
   const dynamicSectionDefs: PromptSection[] = [
-    systemPromptSection('env_info', () =>
-      getEnvironmentSection(model, environment),
-    ),
-    systemPromptSection('language', () =>
-      getLanguageSection(language),
-    ),
-    systemPromptSection('output_style', () =>
-      getOutputStyleSection(outputStyle),
-    ),
-    systemPromptSection('summarize_tool_results', () =>
-      SUMMARIZE_TOOL_RESULTS_SECTION,
-    ),
+    systemPromptSection('env_info', () => getEnvironmentSection(model, environment)),
+    systemPromptSection('language', () => getLanguageSection(language)),
+    systemPromptSection('output_style', () => getOutputStyleSection(outputStyle)),
+    systemPromptSection('summarize_tool_results', () => SUMMARIZE_TOOL_RESULTS_SECTION),
     // Include any developer-provided custom sections
     ...customSections,
   ]
@@ -134,16 +117,18 @@ export async function buildSystemPrompt(
   const resolvedDynamic = await resolveSections(dynamicSectionDefs)
 
   // ── Assemble ───────────────────────────────────────────────────────
-  return asSystemPrompt([
-    // Static content (cacheable)
-    ...staticSections,
-    // Cache boundary marker
-    ...(useCacheBoundary ? [SYSTEM_PROMPT_DYNAMIC_BOUNDARY] : []),
-    // Dynamic content (session-specific)
-    ...resolvedDynamic,
-    // Raw append sections
-    ...appendSections,
-  ].filter((s): s is string => s !== null))
+  return asSystemPrompt(
+    [
+      // Static content (cacheable)
+      ...staticSections,
+      // Cache boundary marker
+      ...(useCacheBoundary ? [SYSTEM_PROMPT_DYNAMIC_BOUNDARY] : []),
+      // Dynamic content (session-specific)
+      ...resolvedDynamic,
+      // Raw append sections
+      ...appendSections,
+    ].filter((s): s is string => s !== null),
+  )
 }
 
 // ─── Priority-based Assembly ───────────────────────────────────────────────
@@ -181,9 +166,7 @@ export interface EffectivePromptOptions {
  *
  * Mirrors codenano's buildEffectiveSystemPrompt().
  */
-export function buildEffectiveSystemPrompt(
-  options: EffectivePromptOptions,
-): SystemPrompt {
+export function buildEffectiveSystemPrompt(options: EffectivePromptOptions): SystemPrompt {
   const {
     overridePrompt,
     agentPrompt,
@@ -207,25 +190,16 @@ export function buildEffectiveSystemPrompt(
         ...(appendPrompt ? [appendPrompt] : []),
       ])
     }
-    return asSystemPrompt([
-      agentPrompt,
-      ...(appendPrompt ? [appendPrompt] : []),
-    ])
+    return asSystemPrompt([agentPrompt, ...(appendPrompt ? [appendPrompt] : [])])
   }
 
   // 2. Custom prompt replaces default
   if (customPrompt) {
-    return asSystemPrompt([
-      customPrompt,
-      ...(appendPrompt ? [appendPrompt] : []),
-    ])
+    return asSystemPrompt([customPrompt, ...(appendPrompt ? [appendPrompt] : [])])
   }
 
   // 3. Default prompt + optional append
-  return asSystemPrompt([
-    ...defaultPrompt,
-    ...(appendPrompt ? [appendPrompt] : []),
-  ])
+  return asSystemPrompt([...defaultPrompt, ...(appendPrompt ? [appendPrompt] : [])])
 }
 
 // ─── Convenience: Simple String Prompt ─────────────────────────────────────

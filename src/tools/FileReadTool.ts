@@ -16,7 +16,9 @@ const inputSchema = z.object({
     .int()
     .nonnegative()
     .optional()
-    .describe('The line number to start reading from (0-based). Only provide if the file is too large to read at once'),
+    .describe(
+      'The line number to start reading from (0-based). Only provide if the file is too large to read at once',
+    ),
   limit: z
     .number()
     .int()
@@ -29,7 +31,8 @@ export type FileReadInput = z.infer<typeof inputSchema>
 
 export const FileReadTool = defineTool({
   name: 'Read',
-  description: 'Reads a file from the local filesystem. Assume this tool is able to read all files on the machine.',
+  description:
+    'Reads a file from the local filesystem. Assume this tool is able to read all files on the machine.',
   input: inputSchema,
   isReadOnly: true,
   isConcurrencySafe: true,
@@ -43,7 +46,10 @@ export const FileReadTool = defineTool({
 
     const stat = fs.statSync(filePath)
     if (stat.isDirectory()) {
-      return { content: `Error: ${filePath} is a directory, not a file. Use Bash with ls to list directory contents.`, isError: true }
+      return {
+        content: `Error: ${filePath} is a directory, not a file. Use Bash with ls to list directory contents.`,
+        isError: true,
+      }
     }
 
     const raw = fs.readFileSync(filePath, 'utf-8')

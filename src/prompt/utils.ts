@@ -12,9 +12,7 @@
  */
 export function prependBullets(items: Array<string | string[]>): string[] {
   return items.flatMap(item =>
-    Array.isArray(item)
-      ? item.map(subitem => `  - ${subitem}`)
-      : [` - ${item}`],
+    Array.isArray(item) ? item.map(subitem => `  - ${subitem}`) : [` - ${item}`],
   )
 }
 
@@ -23,7 +21,5 @@ export function prependBullets(items: Array<string | string[]>): string[] {
  * Filters out null/undefined/empty entries.
  */
 export function joinSections(sections: (string | null | undefined)[]): string {
-  return sections
-    .filter((s): s is string => s != null && s.length > 0)
-    .join('\n\n')
+  return sections.filter((s): s is string => s != null && s.length > 0).join('\n\n')
 }

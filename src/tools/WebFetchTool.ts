@@ -26,7 +26,7 @@ export const WebFetchTool = defineTool({
       const response = await fetch(input.url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; AgentCore/1.0)',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         },
         signal: AbortSignal.timeout(30_000),
       })
@@ -48,17 +48,15 @@ export const WebFetchTool = defineTool({
           .trim()
 
         // Truncate to ~100k chars to avoid blowing up context
-        const truncated = cleaned.length > 100_000
-          ? cleaned.slice(0, 100_000) + '\n\n[Content truncated]'
-          : cleaned
+        const truncated =
+          cleaned.length > 100_000 ? cleaned.slice(0, 100_000) + '\n\n[Content truncated]' : cleaned
 
         return `URL: ${input.url}\nPrompt: ${input.prompt}\n\nContent:\n${truncated}`
       }
 
       // Non-HTML: return raw text
-      const truncated = text.length > 100_000
-        ? text.slice(0, 100_000) + '\n\n[Content truncated]'
-        : text
+      const truncated =
+        text.length > 100_000 ? text.slice(0, 100_000) + '\n\n[Content truncated]' : text
 
       return `URL: ${input.url}\nPrompt: ${input.prompt}\n\nContent:\n${truncated}`
     } catch (err: any) {

@@ -34,18 +34,53 @@ export type BashInput = z.infer<typeof inputSchema>
 
 export const BashTool = defineTool({
   name: 'Bash',
-  description: 'Executes a given bash command and returns its output. The working directory persists between commands.',
+  description:
+    'Executes a given bash command and returns its output. The working directory persists between commands.',
   input: inputSchema,
 
   isReadOnly(input) {
     // Heuristic: read-only if it's a common read command
-    const readOnlyPrefixes = ['ls', 'cat', 'head', 'tail', 'grep', 'find', 'which', 'echo', 'pwd', 'date', 'env', 'git status', 'git log', 'git diff', 'git show', 'git branch']
+    const readOnlyPrefixes = [
+      'ls',
+      'cat',
+      'head',
+      'tail',
+      'grep',
+      'find',
+      'which',
+      'echo',
+      'pwd',
+      'date',
+      'env',
+      'git status',
+      'git log',
+      'git diff',
+      'git show',
+      'git branch',
+    ]
     const cmd = input.command.trim()
     return readOnlyPrefixes.some(p => cmd.startsWith(p))
   },
 
   isConcurrencySafe(input) {
-    const readOnlyPrefixes = ['ls', 'cat', 'head', 'tail', 'grep', 'find', 'which', 'echo', 'pwd', 'date', 'env', 'git status', 'git log', 'git diff', 'git show', 'git branch']
+    const readOnlyPrefixes = [
+      'ls',
+      'cat',
+      'head',
+      'tail',
+      'grep',
+      'find',
+      'which',
+      'echo',
+      'pwd',
+      'date',
+      'env',
+      'git status',
+      'git log',
+      'git diff',
+      'git show',
+      'git branch',
+    ]
     const cmd = input.command.trim()
     return readOnlyPrefixes.some(p => cmd.startsWith(p))
   },
@@ -54,7 +89,7 @@ export const BashTool = defineTool({
     const timeout = Math.min(input.timeout ?? DEFAULT_TIMEOUT_MS, MAX_TIMEOUT_MS)
 
     if (input.run_in_background) {
-      return new Promise<string>((resolve) => {
+      return new Promise<string>(resolve => {
         const child = exec(input.command, {
           timeout,
           maxBuffer: 10 * 1024 * 1024,
@@ -63,8 +98,12 @@ export const BashTool = defineTool({
 
         let stdout = ''
         let stderr = ''
-        child.stdout?.on('data', (d) => { stdout += d })
-        child.stderr?.on('data', (d) => { stderr += d })
+        child.stdout?.on('data', d => {
+          stdout += d
+        })
+        child.stderr?.on('data', d => {
+          stderr += d
+        })
 
         // Return immediately with PID
         resolve(`Background process started (PID: ${child.pid})`)

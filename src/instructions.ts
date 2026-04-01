@@ -56,9 +56,7 @@ const INSTRUCTION_PREAMBLE =
  * Returns the merged instruction content ready to inject into system prompt.
  * Files are loaded from root → cwd (higher priority = loaded later).
  */
-export async function loadInstructions(
-  options: LoadInstructionsOptions = {},
-): Promise<string> {
+export async function loadInstructions(options: LoadInstructionsOptions = {}): Promise<string> {
   const files = await discoverInstructionFiles(options)
   if (files.length === 0) return ''
   return formatInstructions(files)
@@ -113,9 +111,11 @@ export function formatInstructions(files: InstructionFile[]): string {
 
   const sections = files.map(file => {
     const typeLabel =
-      file.type === 'user' ? "(user's private global instructions for all projects)" :
-      file.type === 'project' ? '(project instructions, checked into the codebase)' :
-      "(user's private project instructions, not checked in)"
+      file.type === 'user'
+        ? "(user's private global instructions for all projects)"
+        : file.type === 'project'
+          ? '(project instructions, checked into the codebase)'
+          : "(user's private project instructions, not checked in)"
 
     return `Contents of ${file.path} ${typeLabel}:\n\n${stripFrontmatter(file.content)}`
   })

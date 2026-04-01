@@ -34,14 +34,16 @@ export type LSPInput = z.infer<typeof inputSchema>
 
 export const LSPTool = defineTool({
   name: 'LSP',
-  description: 'Code intelligence tool providing definitions, references, hover info, and symbols via the Language Server Protocol.',
+  description:
+    'Code intelligence tool providing definitions, references, hover info, and symbols via the Language Server Protocol.',
   input: inputSchema,
   isReadOnly: true,
   isConcurrencySafe: true,
 
   async execute(_input) {
     return {
-      content: 'LSPTool requires a language server connection. Override the execute function with your own LSP client integration.',
+      content:
+        'LSPTool requires a language server connection. Override the execute function with your own LSP client integration.',
       isError: true,
     }
   },

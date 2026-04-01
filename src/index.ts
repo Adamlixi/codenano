@@ -122,17 +122,13 @@ export {
   isPromptTooLongError,
 } from './compact.js'
 
-// ── CLAUDE.md Instructions ────────────────────────────────────────────────
-export {
-  loadInstructions,
-  discoverInstructionFiles,
-  formatInstructions,
-} from './instructions.js'
+export { snipIfNeeded } from './snip-compact.js'
+export { microcompact } from './microcompact.js'
 
-export type {
-  InstructionFile,
-  LoadInstructionsOptions,
-} from './instructions.js'
+// ── CLAUDE.md Instructions ────────────────────────────────────────────────
+export { loadInstructions, discoverInstructionFiles, formatInstructions } from './instructions.js'
+
+export type { InstructionFile, LoadInstructionsOptions } from './instructions.js'
 
 // ── Tool Result Budgeting ─────────────────────────────────────────────────
 export {
@@ -154,6 +150,9 @@ export {
 // ── Streaming Tool Executor ──────────────────────────────────────────────
 export { StreamingToolExecutor } from './streaming-tool-executor.js'
 export type { ToolExecutionResult } from './streaming-tool-executor.js'
+
+// ── Tool Executor (Shared Logic) ─────────────────────────────────────────
+export { partitionToolCalls, executeSingleTool, executeBatchConcurrently } from './tool-executor.js'
 
 // ── Types ───────────────────────────────────────────────────────────────────
 export type {

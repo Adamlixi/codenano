@@ -14,14 +14,17 @@ const inputSchema = z.object({
   path: z
     .string()
     .optional()
-    .describe('The directory to search in. If not specified, the current working directory will be used.'),
+    .describe(
+      'The directory to search in. If not specified, the current working directory will be used.',
+    ),
 })
 
 export type GlobInput = z.infer<typeof inputSchema>
 
 export const GlobTool = defineTool({
   name: 'Glob',
-  description: 'Fast file pattern matching tool that works with any codebase size. Supports glob patterns like "**/*.js" or "src/**/*.ts". Returns matching file paths sorted by modification time.',
+  description:
+    'Fast file pattern matching tool that works with any codebase size. Supports glob patterns like "**/*.js" or "src/**/*.ts". Returns matching file paths sorted by modification time.',
   input: inputSchema,
   isReadOnly: true,
   isConcurrencySafe: true,
@@ -43,7 +46,10 @@ export const GlobTool = defineTool({
       }
       return files.join('\n')
     } catch {
-      return { content: `Error: Failed to search for pattern "${input.pattern}" in ${searchDir}`, isError: true }
+      return {
+        content: `Error: Failed to search for pattern "${input.pattern}" in ${searchDir}`,
+        isError: true,
+      }
     }
   },
 })

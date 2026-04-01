@@ -27,14 +27,16 @@ export type WebSearchInput = z.infer<typeof inputSchema>
 
 export const WebSearchTool = defineTool({
   name: 'WebSearch',
-  description: 'Searches the web for real-time information. Returns search results with titles, URLs, and snippets.',
+  description:
+    'Searches the web for real-time information. Returns search results with titles, URLs, and snippets.',
   input: inputSchema,
   isReadOnly: true,
   isConcurrencySafe: true,
 
   async execute(_input) {
     return {
-      content: 'WebSearchTool requires a search backend. Override the execute function with your own search API integration (e.g. Brave, Serper, Tavily).',
+      content:
+        'WebSearchTool requires a search backend. Override the execute function with your own search API integration (e.g. Brave, Serper, Tavily).',
       isError: true,
     }
   },

@@ -13,10 +13,7 @@ import type { OutputStyleConfig } from '../types.js'
  * @param identity — Custom identity string (e.g. "You are a coding assistant")
  * @param outputStyle — Optional output style that overrides default role description
  */
-export function getIntroSection(
-  identity: string,
-  outputStyle?: OutputStyleConfig | null,
-): string {
+export function getIntroSection(identity: string, outputStyle?: OutputStyleConfig | null): string {
   const roleDescription = outputStyle
     ? 'according to your "Output Style" below, which describes how you should respond to user queries.'
     : 'with software engineering tasks. Use the instructions below and the tools available to you to assist the user.'
@@ -30,13 +27,10 @@ IMPORTANT: You must NEVER generate or guess URLs for the user unless you are con
 }
 
 /** Default identity for SDK agents */
-export const DEFAULT_IDENTITY =
-  `You are a Claude agent, built on Anthropic's Claude Agent SDK.`
+export const DEFAULT_IDENTITY = `You are a Claude agent, built on Anthropic's Claude Agent SDK.`
 
 /** codenano CLI identity */
-export const CLAUDE_CODE_IDENTITY =
-  `You are codenano, Anthropic's official CLI for Claude.`
+export const CLAUDE_CODE_IDENTITY = `You are codenano, Anthropic's official CLI for Claude.`
 
 /** codenano running within Agent SDK */
-export const CLAUDE_CODE_SDK_IDENTITY =
-  `You are codenano, Anthropic's official CLI for Claude, running within the Claude Agent SDK.`
+export const CLAUDE_CODE_SDK_IDENTITY = `You are codenano, Anthropic's official CLI for Claude, running within the Claude Agent SDK.`

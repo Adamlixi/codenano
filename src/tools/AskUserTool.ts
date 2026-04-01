@@ -19,12 +19,14 @@ export type AskUserInput = z.infer<typeof inputSchema>
 
 export const AskUserTool = defineTool({
   name: 'AskUserQuestion',
-  description: 'Ask the user a question and wait for their response. Use this when you need clarification or input from the user.',
+  description:
+    'Ask the user a question and wait for their response. Use this when you need clarification or input from the user.',
   input: inputSchema,
 
   async execute(_input) {
     return {
-      content: 'AskUserTool requires a UI integration. Override the execute function to connect to your user interaction layer (CLI readline, web UI, etc.).',
+      content:
+        'AskUserTool requires a UI integration. Override the execute function to connect to your user interaction layer (CLI readline, web UI, etc.).',
       isError: true,
     }
   },

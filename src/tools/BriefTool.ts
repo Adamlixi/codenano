@@ -12,10 +12,7 @@ import { defineTool } from '../tool-builder.js'
 
 const inputSchema = z.object({
   message: z.string().describe('The message to send to the user (supports markdown)'),
-  attachments: z
-    .array(z.string())
-    .optional()
-    .describe('Optional file paths to attach'),
+  attachments: z.array(z.string()).optional().describe('Optional file paths to attach'),
   status: z
     .enum(['normal', 'proactive'])
     .optional()

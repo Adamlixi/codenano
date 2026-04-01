@@ -98,7 +98,13 @@ import { BashTool } from './BashTool.js'
 import { NotebookEditTool } from './NotebookEditTool.js'
 import { WebFetchTool } from './WebFetchTool.js'
 import { BriefTool } from './BriefTool.js'
-import { TaskCreateTool, TaskUpdateTool, TaskGetTool, TaskListTool, TaskStopTool } from './TaskTools.js'
+import {
+  TaskCreateTool,
+  TaskUpdateTool,
+  TaskGetTool,
+  TaskListTool,
+  TaskStopTool,
+} from './TaskTools.js'
 import { TodoWriteTool } from './TodoWriteTool.js'
 import { WebSearchTool } from './WebSearchTool.js'
 import { LSPTool } from './LSPTool.js'
@@ -112,14 +118,7 @@ import { SkillTool } from './SkillTool.js'
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function coreTools(): ToolDef<any>[] {
-  return [
-    FileReadTool,
-    FileEditTool,
-    FileWriteTool,
-    GlobTool,
-    GrepTool,
-    BashTool,
-  ]
+  return [FileReadTool, FileEditTool, FileWriteTool, GlobTool, GrepTool, BashTool]
 }
 
 /**
@@ -148,12 +147,5 @@ export function extendedTools(): ToolDef<any>[] {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function allTools(): ToolDef<any>[] {
-  return [
-    ...extendedTools(),
-    WebSearchTool,
-    LSPTool,
-    AgentTool,
-    AskUserTool,
-    SkillTool,
-  ]
+  return [...extendedTools(), WebSearchTool, LSPTool, AgentTool, AskUserTool, SkillTool]
 }

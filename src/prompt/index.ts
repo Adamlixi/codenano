@@ -19,10 +19,7 @@ export type {
   OutputStyleConfig,
 } from './types.js'
 
-export {
-  asSystemPrompt,
-  SYSTEM_PROMPT_DYNAMIC_BOUNDARY,
-} from './types.js'
+export { asSystemPrompt, SYSTEM_PROMPT_DYNAMIC_BOUNDARY } from './types.js'
 
 // ─── Builder ───────────────────────────────────────────────────────────────
 export {
@@ -32,10 +29,7 @@ export {
   enhancePromptWithEnv,
 } from './builder.js'
 
-export type {
-  PromptConfig,
-  EffectivePromptOptions,
-} from './builder.js'
+export type { PromptConfig, EffectivePromptOptions } from './builder.js'
 
 // ─── Section System ────────────────────────────────────────────────────────
 export {
@@ -60,10 +54,7 @@ export { getActionsSection } from './sections/actions.js'
 export { getToolsSection } from './sections/tools.js'
 export { getToneSection } from './sections/tone.js'
 export { getEfficiencySection } from './sections/efficiency.js'
-export {
-  getEnvironmentSection,
-  detectEnvironment,
-} from './sections/environment.js'
+export { getEnvironmentSection, detectEnvironment } from './sections/environment.js'
 export { getLanguageSection } from './sections/language.js'
 export { getOutputStyleSection } from './sections/outputStyle.js'
 export {

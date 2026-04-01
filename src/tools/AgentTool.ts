@@ -12,12 +12,8 @@ import { z } from 'zod'
 import { defineTool } from '../tool-builder.js'
 
 const inputSchema = z.object({
-  description: z
-    .string()
-    .describe('A short (3-5 word) description of the task'),
-  prompt: z
-    .string()
-    .describe('The task for the agent to perform'),
+  description: z.string().describe('A short (3-5 word) description of the task'),
+  prompt: z.string().describe('The task for the agent to perform'),
   subagent_type: z
     .string()
     .optional()
@@ -48,12 +44,14 @@ export type AgentToolInput = z.infer<typeof inputSchema>
 
 export const AgentTool = defineTool({
   name: 'Agent',
-  description: 'Launch a new agent to handle complex, multi-step tasks autonomously. Each agent runs in its own context with access to tools.',
+  description:
+    'Launch a new agent to handle complex, multi-step tasks autonomously. Each agent runs in its own context with access to tools.',
   input: inputSchema,
 
   async execute(_input) {
     return {
-      content: 'AgentTool requires agent spawning infrastructure. Override the execute function to integrate with createAgent() for recursive agent hierarchies.',
+      content:
+        'AgentTool requires agent spawning infrastructure. Override the execute function to integrate with createAgent() for recursive agent hierarchies.',
       isError: true,
     }
   },

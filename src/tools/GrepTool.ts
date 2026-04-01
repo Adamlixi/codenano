@@ -11,13 +11,21 @@ import { defineTool } from '../tool-builder.js'
 
 const inputSchema = z.object({
   pattern: z.string().describe('The regular expression pattern to search for in file contents'),
-  path: z.string().optional().describe('File or directory to search in. Defaults to current working directory.'),
+  path: z
+    .string()
+    .optional()
+    .describe('File or directory to search in. Defaults to current working directory.'),
   glob: z.string().optional().describe('Glob pattern to filter files (e.g. "*.js", "**/*.tsx")'),
-  type: z.string().optional().describe('File type to search (e.g. "js", "py", "rust", "go", "java")'),
+  type: z
+    .string()
+    .optional()
+    .describe('File type to search (e.g. "js", "py", "rust", "go", "java")'),
   output_mode: z
     .enum(['content', 'files_with_matches', 'count'])
     .optional()
-    .describe('Output mode: "content" shows matching lines, "files_with_matches" shows only file paths (default), "count" shows match counts'),
+    .describe(
+      'Output mode: "content" shows matching lines, "files_with_matches" shows only file paths (default), "count" shows match counts',
+    ),
   '-B': z.number().optional().describe('Number of lines to show before each match'),
   '-A': z.number().optional().describe('Number of lines to show after each match'),
   '-C': z.number().optional().describe('Number of lines to show before and after each match'),
@@ -36,7 +44,8 @@ export type GrepInput = z.infer<typeof inputSchema>
 
 export const GrepTool = defineTool({
   name: 'Grep',
-  description: 'A powerful search tool built on ripgrep. Supports full regex syntax, file type filtering, and multiple output modes.',
+  description:
+    'A powerful search tool built on ripgrep. Supports full regex syntax, file type filtering, and multiple output modes.',
   input: inputSchema,
   isReadOnly: true,
   isConcurrencySafe: true,

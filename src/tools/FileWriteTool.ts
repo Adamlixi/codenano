@@ -10,7 +10,9 @@ import path from 'path'
 import { defineTool } from '../tool-builder.js'
 
 const inputSchema = z.object({
-  file_path: z.string().describe('The absolute path to the file to write (must be absolute, not relative)'),
+  file_path: z
+    .string()
+    .describe('The absolute path to the file to write (must be absolute, not relative)'),
   content: z.string().describe('The content to write to the file'),
 })
 
@@ -18,7 +20,8 @@ export type FileWriteInput = z.infer<typeof inputSchema>
 
 export const FileWriteTool = defineTool({
   name: 'Write',
-  description: 'Writes a file to the local filesystem. This tool will overwrite the existing file if there is one at the provided path.',
+  description:
+    'Writes a file to the local filesystem. This tool will overwrite the existing file if there is one at the provided path.',
   input: inputSchema,
 
   async execute(input) {

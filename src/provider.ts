@@ -54,7 +54,7 @@ export function createClient(config: AgentConfig): Anthropic {
 
   return new Anthropic({
     apiKey: config.apiKey ?? process.env.ANTHROPIC_API_KEY,
-    ...(config.baseURL ?? process.env.ANTHROPIC_BASE_URL
+    ...((config.baseURL ?? process.env.ANTHROPIC_BASE_URL)
       ? { baseURL: config.baseURL ?? process.env.ANTHROPIC_BASE_URL }
       : {}),
     maxRetries: 2,
@@ -63,10 +63,11 @@ export function createClient(config: AgentConfig): Anthropic {
 }
 
 function createBedrockClient(config: AgentConfig): Anthropic {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { AnthropicBedrock } = require('@anthropic-ai/bedrock-sdk') as typeof import('@anthropic-ai/bedrock-sdk')
+  const { AnthropicBedrock } =
+    require('@anthropic-ai/bedrock-sdk') as typeof import('@anthropic-ai/bedrock-sdk')
 
-  const region = config.awsRegion ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1'
+  const region =
+    config.awsRegion ?? process.env.AWS_REGION ?? process.env.AWS_DEFAULT_REGION ?? 'us-east-1'
 
   return new AnthropicBedrock({
     awsRegion: region,
@@ -88,9 +89,7 @@ function detectProvider(): 'anthropic' | 'bedrock' {
 // ─── Tool Schema Conversion ────────────────────────────────────────────────
 
 /** Convert ToolDef[] to Anthropic API tool schemas */
-export function toolDefsToAPISchemas(
-  tools: ToolDef[],
-): Anthropic.Messages.Tool[] {
+export function toolDefsToAPISchemas(tools: ToolDef[]): Anthropic.Messages.Tool[] {
   return tools.map(tool => ({
     name: tool.name,
     description: tool.description,
@@ -146,11 +145,16 @@ export async function* callModelStreaming(
     switch (event.type) {
       case 'message_start': {
         messageId = event.message.id
+        const msgUsage = event.message.usage
         usage = {
-          inputTokens: event.message.usage?.input_tokens ?? 0,
-          outputTokens: event.message.usage?.output_tokens ?? 0,
-          cacheCreationInputTokens: (event.message.usage as any)?.cache_creation_input_tokens ?? 0,
-          cacheReadInputTokens: (event.message.usage as any)?.cache_read_input_tokens ?? 0,
+          inputTokens: msgUsage?.input_tokens ?? 0,
+          outputTokens: msgUsage?.output_tokens ?? 0,
+          cacheCreationInputTokens:
+            ((msgUsage as unknown as Record<string, unknown>)
+              ?.cache_creation_input_tokens as number) ?? 0,
+          cacheReadInputTokens:
+            ((msgUsage as unknown as Record<string, unknown>)?.cache_read_input_tokens as number) ??
+            0,
         }
         yield { type: 'message_start', messageId }
         break
@@ -158,20 +162,29 @@ export async function* callModelStreaming(
 
       case 'content_block_start': {
         if (event.content_block.type === 'tool_use') {
-          yield { type: 'tool_use_start', id: event.content_block.id, name: event.content_block.name }
+          yield {
+            type: 'tool_use_start',
+            id: event.content_block.id,
+            name: event.content_block.name,
+          }
         }
         break
       }
 
       case 'content_block_delta': {
-        const delta = event.delta as any
+        const delta = event.delta
         if (delta.type === 'text_delta') {
-          // Don't mutate SDK's content block — finalMessage() handles accumulation
           yield { type: 'text_delta', text: delta.text }
         } else if (delta.type === 'thinking_delta') {
-          yield { type: 'thinking_delta', thinking: delta.thinking }
+          yield {
+            type: 'thinking_delta',
+            thinking: (delta as unknown as Record<string, unknown>).thinking as string,
+          }
         } else if (delta.type === 'input_json_delta') {
-          yield { type: 'input_json_delta', partialJson: delta.partial_json }
+          yield {
+            type: 'input_json_delta',
+            partialJson: (delta as unknown as Record<string, unknown>).partial_json as string,
+          }
         }
         break
       }
@@ -182,10 +195,11 @@ export async function* callModelStreaming(
       }
 
       case 'message_delta': {
-        stopReason = (event.delta as any).stop_reason ?? null
-        const deltaUsage = event.usage as any
+        const deltaData = event.delta as unknown as Record<string, unknown>
+        stopReason = (deltaData.stop_reason as string | null) ?? null
+        const deltaUsage = event.usage as unknown as Record<string, unknown> | undefined
         if (deltaUsage?.output_tokens) {
-          usage = { ...usage, outputTokens: deltaUsage.output_tokens }
+          usage = { ...usage, outputTokens: deltaUsage.output_tokens as number }
         }
         yield { type: 'message_delta', stopReason, usage }
         break
@@ -193,15 +207,14 @@ export async function* callModelStreaming(
 
       case 'message_stop': {
         const finalMessage = await stream.finalMessage()
-        // Use finalMessage.content as authoritative source — manual assembly
-        // can diverge when proxies include text in content_block_start events
         const assembledContent = finalMessage.content as Anthropic.ContentBlock[]
         stopReason = finalMessage.stop_reason
+        const finalUsage = finalMessage.usage as unknown as Record<string, unknown>
         usage = {
           inputTokens: finalMessage.usage.input_tokens,
           outputTokens: finalMessage.usage.output_tokens,
-          cacheCreationInputTokens: (finalMessage.usage as any).cache_creation_input_tokens ?? 0,
-          cacheReadInputTokens: (finalMessage.usage as any).cache_read_input_tokens ?? 0,
+          cacheCreationInputTokens: (finalUsage.cache_creation_input_tokens as number) ?? 0,
+          cacheReadInputTokens: (finalUsage.cache_read_input_tokens as number) ?? 0,
         }
         yield {
           type: 'message_complete',
@@ -246,6 +259,7 @@ export async function callModel(
     { signal },
   )
 
+  const respUsage = response.usage as unknown as Record<string, unknown>
   return {
     message: response,
     assistantContent: response.content,
@@ -253,8 +267,8 @@ export async function callModel(
     usage: {
       inputTokens: response.usage.input_tokens,
       outputTokens: response.usage.output_tokens,
-      cacheCreationInputTokens: (response.usage as any).cache_creation_input_tokens ?? 0,
-      cacheReadInputTokens: (response.usage as any).cache_read_input_tokens ?? 0,
+      cacheCreationInputTokens: (respUsage.cache_creation_input_tokens as number) ?? 0,
+      cacheReadInputTokens: (respUsage.cache_read_input_tokens as number) ?? 0,
     },
   }
 }
@@ -387,9 +401,7 @@ export function buildToolResultMessage(
 }
 
 /** Merge consecutive user messages (API requires alternating roles) */
-export function mergeConsecutiveUserMessages(
-  messages: MessageParam[],
-): MessageParam[] {
+export function mergeConsecutiveUserMessages(messages: MessageParam[]): MessageParam[] {
   const result: MessageParam[] = []
   for (const msg of messages) {
     const last = result[result.length - 1]

@@ -25,9 +25,7 @@ export function customSection(title: string, content: string): string {
  *
  * @param keepRecent — Number of recent results to keep
  */
-export function getFunctionResultClearingSection(
-  keepRecent: number,
-): string {
+export function getFunctionResultClearingSection(keepRecent: number): string {
   return `# Function Result Clearing
 
 Old tool results will be automatically cleared from context to free up space. The ${keepRecent} most recent results are always kept.`
@@ -37,5 +35,4 @@ Old tool results will be automatically cleared from context to free up space. Th
  * Standard reminder about preserving important information from tool results.
  * Mirrors codenano's SUMMARIZE_TOOL_RESULTS_SECTION.
  */
-export const SUMMARIZE_TOOL_RESULTS_SECTION =
-  `When working with tool results, write down any important information you might need later in your response, as the original tool result may be cleared later.`
+export const SUMMARIZE_TOOL_RESULTS_SECTION = `When working with tool results, write down any important information you might need later in your response, as the original tool result may be cleared later.`

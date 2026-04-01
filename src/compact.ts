@@ -30,44 +30,47 @@ const DEFAULT_CONTEXT_WINDOW = 200_000
 /**
  * Estimate token count for messages.
  *
- * Strategy (mirrors codenano's tokenCountWithEstimation):
- * 1. If lastUsage is provided (from most recent API response), use it as a base
- *    and add rough estimate for messages that came after
- * 2. Otherwise, rough estimate entire conversation: serialized chars / 4
+ * Strategy:
+ * 1. If lastUsage provided, use it as base (most accurate)
+ * 2. Otherwise, estimate: chars / 3.5 (improved from /4)
+ * 3. Add overhead for tool calls and structured content
  */
-export function estimateTokens(
-  messages: MessageParam[],
-  lastUsage?: Usage,
-): number {
+export function estimateTokens(messages: MessageParam[], lastUsage?: Usage): number {
   if (lastUsage) {
-    // We have accurate usage from the last API call.
-    // The usage already accounts for all messages sent in that call.
-    // Any new messages added since are estimated.
     return lastUsage.inputTokens + lastUsage.outputTokens
   }
 
-  // Rough estimate: serialize all messages and divide by 4 (chars per token)
   let totalChars = 0
+  let toolCallCount = 0
+
   for (const msg of messages) {
     if (typeof msg.content === 'string') {
       totalChars += msg.content.length
     } else if (Array.isArray(msg.content)) {
       for (const block of msg.content) {
         if (typeof block === 'object' && block !== null) {
-          const b = block as any
+          const b = block as unknown as Record<string, unknown>
           if (b.type === 'text' && typeof b.text === 'string') {
             totalChars += b.text.length
           } else if (b.type === 'tool_result' && typeof b.content === 'string') {
             totalChars += b.content.length
           } else if (b.type === 'tool_use' && b.input) {
-            totalChars += JSON.stringify(b.input).length
+            const jsonStr = JSON.stringify(b.input)
+            totalChars += jsonStr.length
+            toolCallCount++
           }
         }
       }
     }
   }
 
-  return Math.ceil(totalChars / 4)
+  // Base estimate: 3.5 chars per token (more accurate than 4)
+  const baseTokens = Math.ceil(totalChars / 3.5)
+
+  // Add overhead: ~50 tokens per tool call for structure
+  const toolOverhead = toolCallCount * 50
+
+  return baseTokens + toolOverhead
 }
 
 // ─── Threshold Calculation ───────────────────────────────────────────────────
@@ -246,9 +249,11 @@ export async function compactMessages(
       },
     ]
   } catch (error) {
-    // Compaction failed — log and return null so caller can handle
+    // Compaction failed — return null and let caller handle
     const msg = error instanceof Error ? error.message : String(error)
-    console.warn(`[agent-core] Auto-compact failed: ${msg}`)
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('[agent-core] Auto-compact failed:', msg)
+    }
     return null
   }
 }

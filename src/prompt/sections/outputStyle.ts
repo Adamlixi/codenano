@@ -12,9 +12,7 @@ import type { OutputStyleConfig } from '../types.js'
  * @param config — Output style configuration
  * @returns Section string or null if no custom style
  */
-export function getOutputStyleSection(
-  config: OutputStyleConfig | null | undefined,
-): string | null {
+export function getOutputStyleSection(config: OutputStyleConfig | null | undefined): string | null {
   if (!config) return null
 
   return `# Output Style: ${config.name}

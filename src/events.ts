@@ -8,10 +8,7 @@ import type { StreamEvent } from './types.js'
 import type { ModelStreamEvent } from './provider.js'
 
 /** Convert a ModelStreamEvent to a public StreamEvent (or null if not relevant) */
-export function toPublicEvent(
-  event: ModelStreamEvent,
-  turnNumber: number,
-): StreamEvent | null {
+export function toPublicEvent(event: ModelStreamEvent, turnNumber: number): StreamEvent | null {
   switch (event.type) {
     case 'text_delta':
       return { type: 'text', text: event.text }
