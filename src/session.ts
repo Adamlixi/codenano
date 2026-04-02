@@ -62,6 +62,8 @@ export class SessionImpl implements Session {
   private resolvedSystemPrompt: string | null = null
   private activeModel: string
   private queryTracking: QueryTracking | null = null
+  private stopHookRetryCount = 0
+  private readonly MAX_HOOK_RETRIES = 3
 
   constructor(
     config: AgentConfig,
@@ -388,11 +390,54 @@ export class SessionImpl implements Session {
             messages: this.messages,
             lastResponse: lastText,
           })
+
+          // Handle preventContinuation
+          if (hookResult?.preventContinuation) {
+            this.stopHookRetryCount = 0
+            yield { type: 'turn_end', stopReason: 'stop_hook_prevented', turnNumber: turnCount }
+            yield {
+              type: 'result',
+              result: {
+                text: lastText,
+                messages: this.messages.map(simplifyMessage),
+                usage: totalUsage,
+                stopReason: 'stop_hook_prevented',
+                numTurns: turnCount,
+                durationMs: Date.now() - startTime,
+                queryTracking,
+              },
+            }
+            return
+          }
+
+          // Handle continueWith with retry limit
           if (hookResult?.continueWith) {
+            if (this.stopHookRetryCount >= this.MAX_HOOK_RETRIES) {
+              console.warn('Stop hook retry limit reached')
+              this.stopHookRetryCount = 0
+              yield { type: 'turn_end', stopReason: 'hook_retry_limit', turnNumber: turnCount }
+              yield {
+                type: 'result',
+                result: {
+                  text: lastText,
+                  messages: this.messages.map(simplifyMessage),
+                  usage: totalUsage,
+                  stopReason: 'hook_retry_limit',
+                  numTurns: turnCount,
+                  durationMs: Date.now() - startTime,
+                  queryTracking,
+                },
+              }
+              return
+            }
+            this.stopHookRetryCount++
             this.messages.push({ role: 'user', content: hookResult.continueWith })
             continue
           }
         }
+
+        // Success - reset counter
+        this.stopHookRetryCount = 0
 
         yield { type: 'turn_end', stopReason: lastStopReason, turnNumber: turnCount }
 
