@@ -5,7 +5,7 @@
 Tools are defined with Zod schemas for type-safe input validation:
 
 ```typescript
-import { defineTool } from 'agent-core'
+import { defineTool } from 'codenano'
 import { z } from 'zod'
 
 const grep = defineTool({
@@ -30,7 +30,7 @@ The SDK converts Zod schemas to JSON Schema via `zod-to-json-schema` for the Ant
 17 tools extracted from codenano, organized in three tiers:
 
 ```typescript
-import { createAgent, coreTools, extendedTools, allTools } from 'agent-core'
+import { createAgent, coreTools, extendedTools, allTools } from 'codenano'
 
 // Core: Read, Edit, Write, Glob, Grep, Bash
 createAgent({ model: 'claude-sonnet-4-6', tools: coreTools() })
@@ -38,7 +38,7 @@ createAgent({ model: 'claude-sonnet-4-6', tools: coreTools() })
 // Extended: + NotebookEdit, WebFetch, Brief, Tasks, Todos
 createAgent({ model: 'claude-sonnet-4-6', tools: extendedTools() })
 
-// All: + WebSearch(stub), LSP(stub), Agent(stub), AskUser(stub), Skill(stub)
+// All: + WebSearch(stub), LSP(stub), Agent(stub), AskUserQuestion(stub), Skill(stub)
 createAgent({ model: 'claude-sonnet-4-6', tools: allTools() })
 ```
 
@@ -78,13 +78,13 @@ These have correct input schemas but return errors by default. Override `execute
 | `WebSearch` | Search API (Brave, Serper, Tavily) |
 | `LSP` | Language Server Protocol client |
 | `Agent` | Agent spawning via `createAgent()` |
-| `AskUser` | User interaction channel (stdin, UI, etc.) |
+| `AskUserQuestion` | User interaction channel (stdin, UI, etc.) |
 | `Skill` | Skill/plugin execution runtime |
 
 ### Overriding Stub Execute
 
 ```typescript
-import { WebSearchTool, AgentTool, defineTool } from 'agent-core'
+import { WebSearchTool, AgentTool, defineTool } from 'codenano'
 
 // Method 1: Spread and override
 const myWebSearch = {
@@ -148,7 +148,7 @@ const agent = createAgent({
 **Standalone usage** (for custom pipelines):
 
 ```typescript
-import { StreamingToolExecutor } from 'agent-core'
+import { StreamingToolExecutor } from 'codenano'
 
 const executor = new StreamingToolExecutor(toolMap, config, signal, messages)
 executor.addTool(toolUseBlock)  // start immediately

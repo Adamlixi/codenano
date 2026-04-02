@@ -81,7 +81,7 @@ Tool results are automatically truncated to prevent context bloat:
 
 ```typescript
 // Standalone usage
-import { truncateToolResult, applyMessageBudget } from 'agent-core'
+import { truncateToolResult, applyMessageBudget } from 'codenano'
 
 const budgeted = truncateToolResult(largeOutput, 50_000)
 const budgetedBlocks = applyMessageBudget(contentBlocks, 200_000)

@@ -1,6 +1,6 @@
 # Gap Analysis: codenano vs Claude Code
 
-This codenano SDK captures Claude Code's core agent loop in ~5,500 lines (vs ~150,000+).
+This codenano SDK captures Claude Code's core agent loop in ~6,500 lines (vs ~150,000+).
 
 ## What's Equivalent
 
@@ -23,6 +23,7 @@ This codenano SDK captures Claude Code's core agent loop in ~5,500 lines (vs ~15
 | **CLAUDE.md loading** | Discovers user/project/local/rules files from directory hierarchy |
 | **Streaming tool executor** | Tools start executing as content blocks complete during stream |
 | **Max output escalation** | 8K cap -> 64K escalation before recovery inject (opt-in) |
+| **Memory system** | `saveMemory()`, `loadMemory()`, `scanMemories()`, MEMORY.md index, forked extraction |
 
 ## What's Simplified (by design)
 
@@ -47,7 +48,7 @@ This codenano SDK captures Claude Code's core agent loop in ~5,500 lines (vs ~15
 | Gap | Claude Code | codenano | Impact |
 |-----|-------------|-----|--------|
 | **Hook system** | 16 event types: PreToolUse, PostToolUse, SessionStart, etc. | `onTurnEnd` only | No extensibility points for middleware |
-| **Memory system** | Auto-extract learnings, auto-dream consolidation, 4 memory types | None | No cross-session learning |
+| **Memory system** | Auto-extract learnings, auto-dream consolidation, 4 memory types | Implemented: save/load/scan/extract with forked agent support | Core memory works, no auto-dream consolidation |
 | **MCP protocol** | Full MCP client: auth, resources, tools, elicitation | None | No tool marketplace integration |
 | **Sub-agent spawning** | `AgentTool` -> `runForkedAgent()` with shared prompt cache | Stub tool only | No recursive agent hierarchies |
 | **Permission rules** | Source-layered rules, always-allow/deny lists, bash classifier | Callback only | SDK users must build their own rule engine |

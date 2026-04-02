@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/codenano.svg)](https://www.npmjs.com/package/codenano)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-215%20passing-brightgreen.svg)](https://github.com/Adamlixi/codenano)
+[![Tests](https://img.shields.io/badge/tests-225%20passing-brightgreen.svg)](https://github.com/Adamlixi/codenano)
 
 **The lightweight AI coding agent SDK extracted from Claude Code.**
 
@@ -13,8 +13,8 @@ Built by extracting Claude Code's production architecture. All the power, none o
 
 ## Why codenano?
 
-### 🚀 **Claude Code's Core, 97% Lighter**
-- **5,500 lines** of pure, focused code
+### 🚀 **Claude Code's Core, 96% Lighter**
+- **~6,500 lines** of pure, focused code
 - Claude Code: 150,000+ lines (IDE integration, UI, etc.)
 - **Same agent engine, zero overhead**
 
@@ -92,7 +92,7 @@ const agent = createAgent({
 | Feature | codenano | Claude Code |
 |---------|----------|-------------|
 | **Based On** | Claude Code core | Official Anthropic product |
-| **Lines of Code** | 5,500 (core only) | 150,000+ (full app) |
+| **Lines of Code** | ~6,500 (core only) | 150,000+ (full app) |
 | **What's Included** | Agent engine | Engine + IDE + UI |
 | **Setup Time** | < 1 minute | Install IDE extension |
 | **Use Case** | Build custom agents | Use as-is in IDE |
@@ -141,6 +141,8 @@ allTools()       // All 17 tools
 - ✅ Permission system (security)
 - ✅ Hook system (lifecycle events)
 - ✅ Streaming support (real-time output)
+- ✅ Memory system (cross-session persistence)
+- ✅ Query tracking (debugging/analytics)
 
 ---
 
@@ -155,14 +157,15 @@ codenano/
     session.ts         # Multi-turn conversations
     tools/             # 17 built-in tools
     prompt/            # System prompt builder
+    memory/            # Persistent memory system
     provider.ts        # Anthropic SDK + Bedrock
     compact.ts         # Auto-compact logic
-  tests/               # 191 tests
+  tests/               # 225 tests
   examples/            # Ready-to-run demos
   docs/                # Comprehensive guides
 ```
 
-**191 tests. 100% production-ready.**
+**225 tests. 100% production-ready.**
 
 ---
 
@@ -182,7 +185,7 @@ codenano/
 ## Testing
 
 ```bash
-# Unit tests (191 tests)
+# Unit tests (225 tests)
 npm test
 
 # With coverage
@@ -196,14 +199,20 @@ ANTHROPIC_API_KEY=sk-xxx npm run test:integration
 
 ## Roadmap
 
+**Implemented:**
+- [x] Memory system (cross-session persistence)
+- [x] Task management tools
+- [x] Query tracking (debugging/analytics)
+- [x] Stop hooks (lifecycle callbacks)
+- [x] Tool result budgeting
+
 **Coming Soon:**
-- [ ] Hook system (16 event types)
 - [ ] Sub-agent spawning
-- [ ] Memory system (cross-session persistence)
 - [ ] MCP protocol support
 - [ ] Session persistence
 - [ ] Git integration
 - [ ] Cost tracking
+- [ ] Context Collapse (advanced compression)
 
 ---
 

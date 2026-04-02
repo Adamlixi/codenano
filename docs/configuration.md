@@ -32,6 +32,15 @@ interface AgentConfig {
   thinkingConfig?: 'adaptive' | 'disabled'
   onTurnEnd?: StopHookFn              // stop hook
 
+  // -- Memory -----------------------------------
+  memory?: {
+    memoryDir?: string                 // custom memory directory
+    autoLoad?: boolean                 // load into system prompt (default: true)
+    extractStrategy?: ExtractStrategy  // 'disabled' | 'auto' | { interval: N }
+    extractMaxTurns?: number           // extraction agent max turns (default: 3)
+    useForkedAgent?: boolean           // forked agent with prompt caching (default: false)
+  }
+
   // -- Reliability ------------------------------
   autoCompact?: boolean                // compress on context overflow (default: true)
   fallbackModel?: string               // switch on 3x 529 errors
@@ -84,7 +93,7 @@ const agent = createAgent({
 Standalone API:
 
 ```typescript
-import { loadInstructions, discoverInstructionFiles } from 'agent-core'
+import { loadInstructions, discoverInstructionFiles } from 'codenano'
 
 const instructions = await loadInstructions({ cwd: '/my/project' })
 const files = await discoverInstructionFiles({
@@ -106,4 +115,41 @@ const agent = createAgent({
     return {}
   },
 })
+```
+
+## Memory System
+
+Persistent cross-session memory. The agent can save learnings and load them in future sessions.
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  memory: {
+    autoLoad: true,           // inject memories into system prompt
+    extractStrategy: 'auto',  // extract after every turn
+  },
+})
+```
+
+**Extract strategies:**
+- `'disabled'` (default) -- no automatic extraction
+- `'auto'` -- extract after every completed turn (fire-and-forget)
+- `{ interval: N }` -- extract every N completed turns
+
+**Standalone API:**
+
+```typescript
+import { saveMemory, loadMemory, scanMemories, loadMemoryIndex } from 'codenano'
+
+// Save a memory
+await saveMemory({ dir: '/path/to/memory', name: 'user-prefs', content: '...' })
+
+// Load all memories
+const memories = await loadMemory({ dir: '/path/to/memory' })
+
+// Scan for memory files
+const files = await scanMemories({ dir: '/path/to/memory' })
+
+// Load MEMORY.md index
+const index = await loadMemoryIndex({ dir: '/path/to/memory' })
 ```
