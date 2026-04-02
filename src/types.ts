@@ -122,6 +122,17 @@ export interface AgentConfig {
    * Default: true.
    */
   streamingToolExecution?: boolean
+
+  /**
+   * Memory configuration for persistent agent memory.
+   * When enabled, the agent can save and load memories across sessions.
+   */
+  memory?: {
+    /** Custom memory directory path. Defaults to ~/.agent-core/memory/<project-hash>/ */
+    memoryDir?: string
+    /** Auto-load memories into system prompt. Default: true */
+    autoLoad?: boolean
+  }
 }
 
 // ─── Tool Definition ────────────────────────────────────────────────────────

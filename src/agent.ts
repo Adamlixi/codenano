@@ -135,6 +135,7 @@ class AgentImpl implements Agent {
       tools: this.config.tools,
       language: this.config.language,
       environment: detectEnvironment(),
+      memoryDir: this.config.memory?.autoLoad !== false ? this.config.memory?.memoryDir : undefined,
     })
 
     // Apply priority chain

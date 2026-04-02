@@ -25,6 +25,7 @@ import { getEfficiencySection } from './sections/efficiency.js'
 import { getEnvironmentSection } from './sections/environment.js'
 import { getLanguageSection } from './sections/language.js'
 import { getOutputStyleSection } from './sections/outputStyle.js'
+import { getMemorySection } from './sections/memory.js'
 import { SUMMARIZE_TOOL_RESULTS_SECTION } from './sections/custom.js'
 import type { ToolDef } from '../types.js'
 
@@ -58,6 +59,9 @@ export interface PromptConfig {
 
   /** Raw string sections to append (for simple use cases) */
   appendSections?: string[]
+
+  /** Memory directory path for loading memories into prompt */
+  memoryDir?: string
 }
 
 // ─── Main Builder ──────────────────────────────────────────────────────────
@@ -87,6 +91,7 @@ export async function buildSystemPrompt(config: PromptConfig): Promise<SystemPro
     outputStyle = null,
     language,
     environment,
+    memoryDir,
     useCacheBoundary = true,
     customSections = [],
     appendSections = [],
@@ -109,6 +114,7 @@ export async function buildSystemPrompt(config: PromptConfig): Promise<SystemPro
     systemPromptSection('env_info', () => getEnvironmentSection(model, environment)),
     systemPromptSection('language', () => getLanguageSection(language)),
     systemPromptSection('output_style', () => getOutputStyleSection(outputStyle)),
+    systemPromptSection('memory', () => getMemorySection(memoryDir)),
     systemPromptSection('summarize_tool_results', () => SUMMARIZE_TOOL_RESULTS_SECTION),
     // Include any developer-provided custom sections
     ...customSections,

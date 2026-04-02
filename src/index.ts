@@ -29,6 +29,10 @@
 export { createAgent } from './agent.js'
 export { defineTool } from './tool-builder.js'
 
+// ── Memory ──────────────────────────────────────────────────────────────────
+export { saveMemory, loadMemory, scanMemories, loadMemoryIndex, getMemoryDir } from './memory/index.js'
+export type { Memory, MemoryType, MemoryConfig } from './memory/index.js'
+
 // ── Prompt system ──────────────────────────────────────────────────────────
 export {
   // Builder

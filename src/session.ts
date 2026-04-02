@@ -87,6 +87,7 @@ export class SessionImpl implements Session {
       tools: this.config.tools,
       language: this.config.language,
       environment: detectEnvironment(),
+      memoryDir: this.config.memory?.autoLoad !== false ? this.config.memory?.memoryDir : undefined,
     })
 
     const effective = buildEffectiveSystemPrompt({
