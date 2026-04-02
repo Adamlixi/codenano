@@ -132,6 +132,15 @@ export interface AgentConfig {
     memoryDir?: string
     /** Auto-load memories into system prompt. Default: true */
     autoLoad?: boolean
+    /**
+     * Memory extraction strategy. Default: 'disabled'
+     * - 'disabled': No automatic extraction
+     * - 'auto': Extract after every completed turn (fire-and-forget, like Claude Code)
+     * - { interval: N }: Extract every N completed turns
+     */
+    extractStrategy?: import('./memory/types.js').ExtractStrategy
+    /** Max turns for the extraction agent. Default: 3 */
+    extractMaxTurns?: number
   }
 }
 

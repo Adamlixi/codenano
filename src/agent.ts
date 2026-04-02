@@ -56,6 +56,7 @@ import { StreamingToolExecutor } from './streaming-tool-executor.js'
 import { partitionToolCalls, executeSingleTool, executeBatchConcurrently } from './tool-executor.js'
 import { snipIfNeeded } from './snip-compact.js'
 import { microcompact } from './microcompact.js'
+import { createMemoryExtractor } from './memory/index.js'
 
 // ─── Default Configuration ──────────────────────────────────────────────────
 
@@ -110,6 +111,8 @@ class AgentImpl implements Agent {
   /** Stop hook retry counter */
   private stopHookRetryCount = 0
   private readonly MAX_HOOK_RETRIES = 3
+  /** Memory extractor (if extraction is enabled) */
+  private memoryExtractor: ReturnType<typeof createMemoryExtractor> | null = null
 
   constructor(config: AgentConfig) {
     this.config = config
@@ -118,6 +121,18 @@ class AgentImpl implements Agent {
     this.toolSchemas = toolDefsToAPISchemas(config.tools ?? [])
     this.toolMap = new Map((config.tools ?? []).map(t => [t.name, t]))
     this.abortController = new AbortController()
+
+    // Initialize memory extractor if strategy is not disabled
+    const strategy = config.memory?.extractStrategy
+    if (strategy && strategy !== 'disabled') {
+      this.memoryExtractor = createMemoryExtractor({
+        client: this.client,
+        model: config.model,
+        memoryDir: config.memory?.memoryDir,
+        extractStrategy: strategy,
+        extractMaxTurns: config.memory?.extractMaxTurns,
+      })
+    }
   }
 
   /**
@@ -556,6 +571,11 @@ class AgentImpl implements Agent {
 
         // Success - reset counter
         this.stopHookRetryCount = 0
+
+        // Trigger memory extraction (fire-and-forget)
+        if (this.memoryExtractor) {
+          this.memoryExtractor.triggerExtraction(messages)
+        }
 
         yield {
           type: 'turn_end',

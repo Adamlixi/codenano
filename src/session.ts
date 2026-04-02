@@ -41,6 +41,7 @@ import { StreamingToolExecutor } from './streaming-tool-executor.js'
 import { partitionToolCalls, executeSingleTool, executeBatchConcurrently } from './tool-executor.js'
 import { snipIfNeeded } from './snip-compact.js'
 import { microcompact } from './microcompact.js'
+import { createMemoryExtractor } from './memory/index.js'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -64,6 +65,7 @@ export class SessionImpl implements Session {
   private queryTracking: QueryTracking | null = null
   private stopHookRetryCount = 0
   private readonly MAX_HOOK_RETRIES = 3
+  private memoryExtractor: ReturnType<typeof createMemoryExtractor> | null = null
 
   constructor(
     config: AgentConfig,
@@ -76,6 +78,18 @@ export class SessionImpl implements Session {
     this.client = client
     this.toolSchemas = toolSchemas
     this.toolMap = toolMap
+
+    // Initialize memory extractor
+    const strategy = config.memory?.extractStrategy
+    if (strategy && strategy !== 'disabled') {
+      this.memoryExtractor = createMemoryExtractor({
+        client: this.client,
+        model: config.model,
+        memoryDir: config.memory?.memoryDir,
+        extractStrategy: strategy,
+        extractMaxTurns: config.memory?.extractMaxTurns,
+      })
+    }
   }
 
   private async getSystemPrompt(): Promise<string> {
@@ -439,6 +453,11 @@ export class SessionImpl implements Session {
 
         // Success - reset counter
         this.stopHookRetryCount = 0
+
+        // Trigger memory extraction (fire-and-forget)
+        if (this.memoryExtractor) {
+          this.memoryExtractor.triggerExtraction(this.messages)
+        }
 
         yield { type: 'turn_end', stopReason: lastStopReason, turnNumber: turnCount }
 
