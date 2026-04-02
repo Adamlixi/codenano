@@ -78,6 +78,39 @@ const resumed = agent.session(session.id)
 await resumed.send('我们发现了什么？')
 ```
 
+### 跨会话记忆？自动。
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  memory: {
+    autoLoad: true,           // 将已保存的记忆注入系统提示
+    extractStrategy: 'auto',  // 每轮结束后自动提取记忆
+  },
+})
+
+// 代理从对话中学习，并在会话间记忆：
+// - 用户偏好和角色
+// - 工作方式反馈（避免什么/重复什么）
+// - 项目上下文和决策
+// - 外部系统的指引
+```
+
+记忆以带有 frontmatter 的 markdown 文件存储，由 `MEMORY.md` 索引。也可以直接使用独立 API：
+
+```typescript
+import { saveMemory, scanMemories, loadMemoryIndex } from 'codenano'
+
+saveMemory({
+  name: 'user_role',
+  description: '用户是后端工程师',
+  type: 'user',
+  content: '擅长 Go 和 Python，刚接触 React',
+}, '/path/to/memory')
+
+const memories = scanMemories('/path/to/memory')
+```
+
 ### 自定义工具
 
 ```typescript

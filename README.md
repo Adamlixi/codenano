@@ -81,6 +81,39 @@ const resumed = agent.session(session.id)
 await resumed.send('What did we find?')
 ```
 
+### Cross-session memory? Automatic.
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  memory: {
+    autoLoad: true,           // inject saved memories into system prompt
+    extractStrategy: 'auto',  // extract memories after every turn
+  },
+})
+
+// The agent learns from conversations and remembers across sessions:
+// - User preferences and role
+// - Feedback on approach (what to avoid/repeat)
+// - Project context and decisions
+// - Pointers to external systems
+```
+
+Memories are stored as markdown files with frontmatter, indexed by `MEMORY.md`. Use the standalone API for direct access:
+
+```typescript
+import { saveMemory, scanMemories, loadMemoryIndex } from 'codenano'
+
+saveMemory({
+  name: 'user_role',
+  description: 'User is a backend engineer',
+  type: 'user',
+  content: 'Expert in Go and Python, new to React',
+}, '/path/to/memory')
+
+const memories = scanMemories('/path/to/memory')
+```
+
 ### Custom Tools
 
 ```typescript

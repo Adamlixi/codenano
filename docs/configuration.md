@@ -143,22 +143,42 @@ const agent = createAgent({
 - `'auto'` -- extract after every completed turn (fire-and-forget)
 - `{ interval: N }` -- extract every N completed turns
 
+**Memory types:**
+- `user` -- user's role, preferences, knowledge
+- `feedback` -- guidance on approach (what to avoid or repeat)
+- `project` -- project state, goals, events (not derivable from code)
+- `reference` -- pointers to external systems
+
+**Storage format:** Each memory is a `.md` file with frontmatter (`name`, `description`, `type`) plus content. An auto-maintained `MEMORY.md` index links all memories.
+
 **Standalone API:**
 
 ```typescript
-import { saveMemory, loadMemory, scanMemories, loadMemoryIndex } from 'codenano'
+import { saveMemory, loadMemory, scanMemories, loadMemoryIndex, getMemoryDir } from 'codenano'
 
-// Save a memory
-await saveMemory({ dir: '/path/to/memory', name: 'user-prefs', content: '...' })
+// Save a memory (creates .md file + updates MEMORY.md index)
+saveMemory({
+  name: 'user_role',
+  description: 'User is a backend engineer',
+  type: 'user',
+  content: 'Expert in Go and Python, new to React',
+}, '/path/to/memory')
 
-// Load all memories
-const memories = await loadMemory({ dir: '/path/to/memory' })
+// Load a single memory from file
+const memory = loadMemory('/path/to/memory/user_role.md')
+// => { name, description, type, content }
 
-// Scan for memory files
-const files = await scanMemories({ dir: '/path/to/memory' })
+// Scan all memories in a directory
+const memories = scanMemories('/path/to/memory')
+// => Memory[]
 
-// Load MEMORY.md index
-const index = await loadMemoryIndex({ dir: '/path/to/memory' })
+// Load the MEMORY.md index
+const index = loadMemoryIndex('/path/to/memory')
+// => string | null
+
+// Get default memory directory (based on cwd hash)
+const dir = getMemoryDir()
+// => ~/.agent-core/memory/<hash>/
 ```
 
 ## Session Persistence
