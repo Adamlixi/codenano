@@ -141,6 +141,8 @@ export interface AgentConfig {
     extractStrategy?: import('./memory/types.js').ExtractStrategy
     /** Max turns for the extraction agent. Default: 3 */
     extractMaxTurns?: number
+    /** Use forked agent with prompt caching for extraction. Default: false (use direct API) */
+    useForkedAgent?: boolean
   }
 }
 

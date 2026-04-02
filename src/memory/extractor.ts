@@ -12,6 +12,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import type { MessageParam } from '@anthropic-ai/sdk/resources/messages.js'
 import type { ExtractStrategy, Memory } from './types.js'
 import { getMemoryDir, scanMemories, saveMemory, loadMemoryIndex } from './storage.js'
+import { runForkedExtraction } from './forked-extractor.js'
 
 const DEFAULT_EXTRACT_MAX_TURNS = 3
 
@@ -66,6 +67,7 @@ export interface ExtractorConfig {
   memoryDir?: string
   extractStrategy: ExtractStrategy
   extractMaxTurns?: number
+  useForkedAgent?: boolean  // Use forked agent with caching (default: false for simplicity)
 }
 
 export interface ExtractorState {
@@ -85,6 +87,7 @@ export function createMemoryExtractor(config: ExtractorConfig) {
     memoryDir,
     extractStrategy,
     extractMaxTurns = DEFAULT_EXTRACT_MAX_TURNS,
+    useForkedAgent = false,
   } = config
 
   // ── Closure state ───────────────────────────────────────────────
@@ -113,45 +116,54 @@ export function createMemoryExtractor(config: ExtractorConfig) {
 
   // ── Run extraction ──────────────────────────────────────────────
   async function runExtraction(messages: MessageParam[]): Promise<void> {
-    try {
-      const dir = getMemoryDir(memoryDir)
-      const existingMemories = scanMemories(memoryDir)
-      const indexContent = loadMemoryIndex(memoryDir)
-
-      const prompt = buildExtractionPrompt(
-        Math.min(messages.length, 10),
-        existingMemories,
-        indexContent,
+    if (useForkedAgent) {
+      // Use forked agent with prompt caching
+      await runForkedExtraction(
+        { client, model, memoryDir, extractMaxTurns },
+        messages
       )
+    } else {
+      // Use direct API call (simpler, but no caching)
+      try {
+        const dir = getMemoryDir(memoryDir)
+        const existingMemories = scanMemories(memoryDir)
+        const indexContent = loadMemoryIndex(memoryDir)
 
-      // Call model to extract memories
-      const response = await client.messages.create({
-        model,
-        max_tokens: 4096,
-        system: prompt,
-        messages: messages.slice(-10), // Last 10 messages for context
-      })
+        const prompt = buildExtractionPrompt(
+          Math.min(messages.length, 10),
+          existingMemories,
+          indexContent,
+        )
 
-      // Parse response
-      const text = response.content
-        .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-        .map(b => b.text)
-        .join('')
+        // Call model to extract memories
+        const response = await client.messages.create({
+          model,
+          max_tokens: 4096,
+          system: prompt,
+          messages: messages.slice(-10), // Last 10 messages for context
+        })
 
-      const jsonMatch = text.match(/\[[\s\S]*\]/)
-      if (!jsonMatch) return
+        // Parse response
+        const text = response.content
+          .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+          .map(b => b.text)
+          .join('')
 
-      const memories: Memory[] = JSON.parse(jsonMatch[0])
-      if (!Array.isArray(memories) || memories.length === 0) return
+        const jsonMatch = text.match(/\[[\s\S]*\]/)
+        if (!jsonMatch) return
 
-      // Save extracted memories
-      for (const mem of memories) {
-        if (mem.name && mem.description && mem.type && mem.content) {
-          saveMemory(mem, memoryDir)
+        const memories: Memory[] = JSON.parse(jsonMatch[0])
+        if (!Array.isArray(memories) || memories.length === 0) return
+
+        // Save extracted memories
+        for (const mem of memories) {
+          if (mem.name && mem.description && mem.type && mem.content) {
+            saveMemory(mem, memoryDir)
+          }
         }
+      } catch {
+        // Extraction is best-effort — log but don't throw
       }
-    } catch {
-      // Extraction is best-effort — log but don't throw
     }
   }
 

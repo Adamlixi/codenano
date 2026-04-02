@@ -131,6 +131,7 @@ class AgentImpl implements Agent {
         memoryDir: config.memory?.memoryDir,
         extractStrategy: strategy,
         extractMaxTurns: config.memory?.extractMaxTurns,
+        useForkedAgent: config.memory?.useForkedAgent,
       })
     }
   }
