@@ -22,6 +22,7 @@ import type {
   ToolContext,
   ToolOutput,
   MessageParam as PublicMessageParam,
+  QueryTracking,
 } from './types.js'
 import {
   callModelStreamingWithRetry,
@@ -60,6 +61,7 @@ export class SessionImpl implements Session {
   private abortController: AbortController = new AbortController()
   private resolvedSystemPrompt: string | null = null
   private activeModel: string
+  private queryTracking: QueryTracking | null = null
 
   constructor(
     config: AgentConfig,
@@ -160,6 +162,21 @@ export class SessionImpl implements Session {
       cacheCreationInputTokens: 0,
       cacheReadInputTokens: 0,
     }
+
+    // Initialize or increment query tracking
+    const queryTracking: QueryTracking = this.queryTracking
+      ? {
+          chainId: this.queryTracking.chainId,
+          depth: this.queryTracking.depth + 1,
+        }
+      : {
+          chainId: crypto.randomUUID(),
+          depth: 0,
+        }
+    this.queryTracking = queryTracking
+
+    // Emit query_start event
+    yield { type: 'query_start', queryTracking }
 
     const maxRecoveryAttempts = this.config.maxOutputRecoveryAttempts ?? MAX_OUTPUT_RECOVERY_LIMIT
     const useStreamingExecution = this.config.streamingToolExecution !== false
@@ -389,6 +406,7 @@ export class SessionImpl implements Session {
             stopReason: lastStopReason,
             numTurns: turnCount,
             durationMs: Date.now() - startTime,
+            queryTracking,
           },
         }
         return
@@ -472,6 +490,7 @@ export class SessionImpl implements Session {
         stopReason: `max_turns (${this.config.maxTurns ?? 30})`,
         numTurns: turnCount,
         durationMs: Date.now() - startTime,
+        queryTracking,
       },
     }
   }

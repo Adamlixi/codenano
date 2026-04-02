@@ -32,6 +32,7 @@ import type {
   Usage,
   ToolContext,
   ToolOutput,
+  QueryTracking,
 } from './types.js'
 import { SessionImpl } from './session.js'
 import {
@@ -104,6 +105,8 @@ class AgentImpl implements Agent {
   private resolvedSystemPrompt: string | null = null
   /** Current active model — may switch to fallbackModel on 529 errors */
   private activeModel: string
+  /** Query tracking for current execution */
+  private queryTracking: QueryTracking | null = null
 
   constructor(config: AgentConfig) {
     this.config = config
@@ -223,6 +226,21 @@ class AgentImpl implements Agent {
       cacheCreationInputTokens: 0,
       cacheReadInputTokens: 0,
     }
+
+    // Initialize or increment query tracking
+    const queryTracking: QueryTracking = this.queryTracking
+      ? {
+          chainId: this.queryTracking.chainId,
+          depth: this.queryTracking.depth + 1,
+        }
+      : {
+          chainId: crypto.randomUUID(),
+          depth: 0,
+        }
+    this.queryTracking = queryTracking
+
+    // Emit query_start event
+    yield { type: 'query_start', queryTracking }
 
     const maxRecoveryAttempts = this.config.maxOutputRecoveryAttempts ?? MAX_OUTPUT_RECOVERY_LIMIT
     const useStreamingExecution = this.config.streamingToolExecution !== false
@@ -502,6 +520,7 @@ class AgentImpl implements Agent {
             stopReason: lastStopReason,
             numTurns: turnCount,
             durationMs: Date.now() - startTime,
+            queryTracking,
           },
         }
         return
@@ -593,6 +612,7 @@ class AgentImpl implements Agent {
         stopReason: `max_turns (${maxTurns})`,
         numTurns: turnCount,
         durationMs: Date.now() - startTime,
+        queryTracking,
       },
     }
   }

@@ -173,6 +173,16 @@ export type PermissionFn = (
 /** Permission decision */
 export type PermissionDecision = { behavior: 'allow' } | { behavior: 'deny'; message?: string }
 
+// ─── Query Tracking ─────────────────────────────────────────────────────────
+
+/** Query chain tracking for debugging and analytics */
+export interface QueryTracking {
+  /** Unique identifier for this query chain */
+  chainId: string
+  /** Nesting depth (0 for main query, increments for recursive calls) */
+  depth: number
+}
+
 // ─── Stop Hook ──────────────────────────────────────────────────────────────
 
 /** Called when agent completes a turn without tool use */
@@ -199,6 +209,7 @@ export type StreamEvent =
   | { type: 'tool_result'; toolUseId: string; output: string; isError: boolean }
   | { type: 'turn_start'; turnNumber: number }
   | { type: 'turn_end'; stopReason: string; turnNumber: number }
+  | { type: 'query_start'; queryTracking: QueryTracking }
   | { type: 'result'; result: Result }
   | { type: 'error'; error: Error }
 
@@ -223,6 +234,9 @@ export interface Result {
 
   /** Duration in milliseconds */
   durationMs: number
+
+  /** Query tracking information */
+  queryTracking: QueryTracking
 }
 
 /** Token usage statistics */

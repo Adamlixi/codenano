@@ -182,4 +182,7 @@ export type {
   // Hooks
   StopHookFn,
   StopHookResult,
+
+  // Query tracking
+  QueryTracking,
 } from './types.js'
