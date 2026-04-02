@@ -33,6 +33,10 @@ export { defineTool } from './tool-builder.js'
 export { saveMemory, loadMemory, scanMemories, loadMemoryIndex, getMemoryDir } from './memory/index.js'
 export type { Memory, MemoryType, MemoryConfig } from './memory/index.js'
 
+// ── Session Persistence ────────────────────────────────────────────────────
+export { listSessions, loadSession, getSessionStorageDir } from './session-storage.js'
+export type { TranscriptEntry, SessionMetadata, SessionPersistConfig, LoadedSession } from './session-storage.js'
+
 // ── Prompt system ──────────────────────────────────────────────────────────
 export {
   // Builder

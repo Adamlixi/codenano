@@ -124,6 +124,19 @@ export interface AgentConfig {
   streamingToolExecution?: boolean
 
   /**
+   * Session persistence configuration.
+   * When enabled, session messages are saved to JSONL files and can be resumed later.
+   */
+  persistence?: {
+    /** Enable persistence. Default: false */
+    enabled: boolean
+    /** Directory to store session JSONL files. Default: ~/.agent-core/sessions/ */
+    storageDir?: string
+    /** Existing session ID to resume. Loads messages from the JSONL file. */
+    resumeSessionId?: string
+  }
+
+  /**
    * Memory configuration for persistent agent memory.
    * When enabled, the agent can save and load memories across sessions.
    */
@@ -291,8 +304,8 @@ export interface Agent {
   /** Streaming: yield events as the agent works */
   stream(prompt: string): AsyncIterable<StreamEvent>
 
-  /** Create a multi-turn session with persistent history */
-  session(): Session
+  /** Create a multi-turn session with persistent history, or resume by ID */
+  session(sessionId?: string): Session
 
   /** Abort the current operation */
   abort(): void
@@ -300,6 +313,9 @@ export interface Agent {
 
 /** A multi-turn conversation session */
 export interface Session {
+  /** Unique session identifier (UUID). Use this to resume the session later. */
+  readonly id: string
+
   /** Send a message and get the result (accumulates history) */
   send(prompt: string): Promise<Result>
 

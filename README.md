@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/codenano.svg)](https://www.npmjs.com/package/codenano)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![Tests](https://img.shields.io/badge/tests-225%20passing-brightgreen.svg)](https://github.com/Adamlixi/codenano)
+[![Tests](https://img.shields.io/badge/tests-326%20passing-brightgreen.svg)](https://github.com/Adamlixi/codenano)
 
 **The lightweight AI coding agent SDK extracted from Claude Code.**
 
@@ -61,6 +61,24 @@ for await (const event of agent.stream('What files are here?')) {
 const session = agent.session()
 await session.send('Read main.ts')
 await session.send('Now explain what it does')
+```
+
+### Session persistence? Built-in.
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  tools: coreTools(),
+  persistence: { enabled: true },  // saves to ~/.agent-core/sessions/
+})
+
+const session = agent.session()
+console.log(session.id)  // save this UUID
+await session.send('Analyze the codebase')
+
+// Later — resume from where you left off
+const resumed = agent.session(session.id)
+await resumed.send('What did we find?')
 ```
 
 ### Custom Tools
@@ -143,6 +161,7 @@ allTools()       // All 17 tools
 - ✅ Streaming support (real-time output)
 - ✅ Memory system (cross-session persistence)
 - ✅ Query tracking (debugging/analytics)
+- ✅ Session persistence (JSONL-based save/resume)
 
 ---
 
@@ -155,17 +174,18 @@ codenano/
   src/
     agent.ts           # Core agent loop
     session.ts         # Multi-turn conversations
+    session-storage.ts # Session persistence (JSONL)
     tools/             # 17 built-in tools
     prompt/            # System prompt builder
     memory/            # Persistent memory system
     provider.ts        # Anthropic SDK + Bedrock
     compact.ts         # Auto-compact logic
-  tests/               # 225 tests
+  tests/               # 326 tests
   examples/            # Ready-to-run demos
   docs/                # Comprehensive guides
 ```
 
-**225 tests. 100% production-ready.**
+**326 tests. 100% production-ready.**
 
 ---
 
@@ -185,7 +205,7 @@ codenano/
 ## Testing
 
 ```bash
-# Unit tests (225 tests)
+# Unit tests (326 tests)
 npm test
 
 # With coverage
@@ -205,11 +225,11 @@ ANTHROPIC_API_KEY=sk-xxx npm run test:integration
 - [x] Query tracking (debugging/analytics)
 - [x] Stop hooks (lifecycle callbacks)
 - [x] Tool result budgeting
+- [x] Session persistence (JSONL save/resume)
 
 **Coming Soon:**
 - [ ] Sub-agent spawning
 - [ ] MCP protocol support
-- [ ] Session persistence
 - [ ] Git integration
 - [ ] Cost tracking
 - [ ] Context Collapse (advanced compression)

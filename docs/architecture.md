@@ -55,6 +55,8 @@ createAgent(config)
 
 `ask()` is a convenience wrapper around `stream()` -- streaming is the primitive.
 
+Sessions can optionally persist to disk as JSONL files (`persistence: { enabled: true }`). Each session gets a UUID (`session.id`) and can be resumed later via `agent.session(sessionId)`. The JSONL format mirrors Claude Code's session storage: one entry per line, append-only writes, line-by-line reads for restore.
+
 ## Continue Paths
 
 codenano's `queryLoop` has 7 continue paths. The SDK implements 5:

@@ -60,6 +60,24 @@ await session.send('读取 main.ts')
 await session.send('现在解释它做什么')
 ```
 
+### 会话持久化？内置。
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  tools: coreTools(),
+  persistence: { enabled: true },  // 保存到 ~/.agent-core/sessions/
+})
+
+const session = agent.session()
+console.log(session.id)  // 保存这个 UUID
+await session.send('分析代码库')
+
+// 之后 — 从上次中断处恢复
+const resumed = agent.session(session.id)
+await resumed.send('我们发现了什么？')
+```
+
 ### 自定义工具
 
 ```typescript
@@ -172,6 +190,7 @@ allTools()       // 全部 17 个工具
 - ✅ 流式支持（实时输出）
 - ✅ 记忆系统（跨会话持久化）
 - ✅ 查询追踪（调试/分析）
+- ✅ 会话持久化（基于 JSONL 的保存/恢复）
 
 ---
 
@@ -184,17 +203,18 @@ codenano/
   src/
     agent.ts           # 核心代理循环
     session.ts         # 多轮对话
+    session-storage.ts # 会话持久化（JSONL）
     tools/             # 17 个内置工具
     prompt/            # 系统提示构建器
     memory/            # 持久化记忆系统
     provider.ts        # Anthropic SDK + Bedrock
     compact.ts         # 自动压缩逻辑
-  tests/               # 225 个测试
+  tests/               # 326 个测试
   examples/            # 可运行示例
   docs/                # 完整文档
 ```
 
-**225 个测试。100% 生产就绪。**
+**326 个测试。100% 生产就绪。**
 
 ---
 
@@ -214,7 +234,7 @@ codenano/
 ## 测试
 
 ```bash
-# 单元测试（225 个测试）
+# 单元测试（326 个测试）
 npm test
 
 # 带覆盖率
@@ -234,11 +254,11 @@ ANTHROPIC_API_KEY=sk-xxx npm run test:integration
 - [x] 查询追踪（调试/分析）
 - [x] 停止钩子（生命周期回调）
 - [x] 工具结果预算
+- [x] 会话持久化（JSONL 保存/恢复）
 
 **即将推出：**
 - [ ] 子代理生成
 - [ ] MCP 协议支持
-- [ ] 会话持久化
 - [ ] Git 集成
 - [ ] 成本跟踪
 - [ ] 上下文折叠（高级压缩）

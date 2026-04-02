@@ -43,6 +43,7 @@ import { snipIfNeeded } from './snip-compact.js'
 import { microcompact } from './microcompact.js'
 import { createMemoryExtractor } from './memory/index.js'
 import { getMemorySection } from './prompt/sections/memory.js'
+import { appendEntry, loadSession } from './session-storage.js'
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
@@ -67,6 +68,7 @@ export class SessionImpl implements Session {
   private stopHookRetryCount = 0
   private readonly MAX_HOOK_RETRIES = 3
   private memoryExtractor: ReturnType<typeof createMemoryExtractor> | null = null
+  private _sessionId: string
 
   constructor(
     config: AgentConfig,
@@ -79,6 +81,30 @@ export class SessionImpl implements Session {
     this.client = client
     this.toolSchemas = toolSchemas
     this.toolMap = toolMap
+
+    // Session persistence: generate or restore session ID
+    this._sessionId = config.persistence?.resumeSessionId ?? crypto.randomUUID()
+
+    if (config.persistence?.enabled) {
+      if (config.persistence.resumeSessionId) {
+        // Resume: load messages from JSONL
+        const loaded = loadSession(this._sessionId, config.persistence)
+        if (loaded) {
+          this.messages = loaded.messages
+        }
+      } else {
+        // New session: write metadata entry
+        appendEntry(this._sessionId, {
+          type: 'metadata',
+          timestamp: new Date().toISOString(),
+          metadata: {
+            sessionId: this._sessionId,
+            model: config.model,
+            createdAt: new Date().toISOString(),
+          },
+        }, config.persistence)
+      }
+    }
 
     // Initialize memory extractor
     const strategy = config.memory?.extractStrategy
@@ -139,6 +165,19 @@ export class SessionImpl implements Session {
     return { ...this.config, model: this.activeModel }
   }
 
+  get id(): string {
+    return this._sessionId
+  }
+
+  private persistMessage(msg: MessageParam): void {
+    if (!this.config.persistence?.enabled) return
+    appendEntry(this._sessionId, {
+      type: 'message',
+      timestamp: new Date().toISOString(),
+      message: { role: msg.role, content: msg.content },
+    }, this.config.persistence)
+  }
+
   async send(prompt: string): Promise<Result> {
     let result: Result | undefined
     for await (const event of this.runSessionTurn(prompt)) {
@@ -175,6 +214,7 @@ export class SessionImpl implements Session {
     const maxTurns = this.config.maxTurns ?? 30
 
     this.messages.push({ role: 'user', content: prompt })
+    this.persistMessage(this.messages[this.messages.length - 1]!)
 
     const systemPrompt = await this.getSystemPrompt()
     let turnCount = 0
@@ -368,6 +408,7 @@ export class SessionImpl implements Session {
         role: 'assistant',
         content: modelResult.assistantContent as ContentBlockParam[],
       })
+      this.persistMessage(this.messages[this.messages.length - 1]!)
 
       // ── Max Output Escalation + Recovery ───────────────────────────
       if (lastStopReason === 'max_tokens') {
@@ -391,6 +432,7 @@ export class SessionImpl implements Session {
             maxOutputTokensOverride = undefined
           }
           this.messages.push({ role: 'user', content: MAX_OUTPUT_RECOVERY_MESSAGE })
+          this.persistMessage(this.messages[this.messages.length - 1]!)
           continue
         }
       }
@@ -457,6 +499,7 @@ export class SessionImpl implements Session {
             }
             this.stopHookRetryCount++
             this.messages.push({ role: 'user', content: hookResult.continueWith })
+            this.persistMessage(this.messages[this.messages.length - 1]!)
             continue
           }
         }
@@ -552,6 +595,7 @@ export class SessionImpl implements Session {
       const budgetedResults = enableBudget ? applyMessageBudget(allToolResults) : allToolResults
 
       this.messages.push({ role: 'user', content: budgetedResults })
+      this.persistMessage(this.messages[this.messages.length - 1]!)
     }
 
     // Max turns reached

@@ -41,6 +41,13 @@ interface AgentConfig {
     useForkedAgent?: boolean           // forked agent with prompt caching (default: false)
   }
 
+  // -- Session Persistence ----------------------
+  persistence?: {
+    enabled: boolean                   // enable JSONL persistence (default: false)
+    storageDir?: string                // custom storage dir (default: ~/.agent-core/sessions/)
+    resumeSessionId?: string           // resume an existing session by ID
+  }
+
   // -- Reliability ------------------------------
   autoCompact?: boolean                // compress on context overflow (default: true)
   fallbackModel?: string               // switch on 3x 529 errors
@@ -152,4 +159,48 @@ const files = await scanMemories({ dir: '/path/to/memory' })
 
 // Load MEMORY.md index
 const index = await loadMemoryIndex({ dir: '/path/to/memory' })
+```
+
+## Session Persistence
+
+Save and resume multi-turn sessions using JSONL files. Inspired by Claude Code's session storage design.
+
+```typescript
+const agent = createAgent({
+  model: 'claude-sonnet-4-6',
+  tools: coreTools(),
+  persistence: {
+    enabled: true,                    // enable JSONL persistence
+    storageDir: './my-sessions',      // optional custom directory
+  },
+})
+
+// Start a new session — messages auto-save after each turn
+const session = agent.session()
+console.log(session.id)  // UUID — save this to resume later
+await session.send('Analyze the codebase')
+
+// Resume an existing session by ID
+const resumed = agent.session(session.id)
+// resumed.history contains all previous messages
+await resumed.send('What did we find?')
+```
+
+**Storage format:** Each session is a `<sessionId>.jsonl` file. The first line is metadata, subsequent lines are messages. Append-only writes, line-by-line reads for restore.
+
+**Standalone API:**
+
+```typescript
+import { listSessions, loadSession, getSessionStorageDir } from 'codenano'
+
+// List all saved sessions
+const sessions = listSessions({ storageDir: './my-sessions' })
+
+// Load a specific session
+const loaded = loadSession('session-uuid', { storageDir: './my-sessions' })
+console.log(loaded.metadata)   // { sessionId, model, createdAt }
+console.log(loaded.messages)   // MessageParam[]
+
+// Get the storage directory path
+const dir = getSessionStorageDir()  // ~/.agent-core/sessions/
 ```

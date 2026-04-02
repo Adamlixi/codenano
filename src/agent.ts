@@ -209,8 +209,18 @@ class AgentImpl implements Agent {
     return this.runAgentLoop(prompt, [])
   }
 
-  session(): SessionImpl {
-    return new SessionImpl(this.config, this.client, this.toolSchemas, this.toolMap)
+  session(sessionId?: string): SessionImpl {
+    const config = sessionId
+      ? {
+          ...this.config,
+          persistence: {
+            ...this.config.persistence,
+            enabled: true,
+            resumeSessionId: sessionId,
+          },
+        }
+      : this.config
+    return new SessionImpl(config, this.client, this.toolSchemas, this.toolMap)
   }
 
   abort(): void {

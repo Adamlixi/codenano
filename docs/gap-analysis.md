@@ -57,7 +57,7 @@ This codenano SDK captures Claude Code's core agent loop in ~6,500 lines (vs ~15
 
 | Gap | codenano | SDK |
 |-----|-------------|-----|
-| Session persistence | Transcript saved to disk, `/resume` to reload | None |
+| Session persistence | Transcript saved to disk, `/resume` to reload | JSONL-based persistence via `persistence` config, `session.id` + `agent.session(id)` for resume |
 | Skill/plugin system | Loadable skills from disk + marketplace | None |
 | Git integration | Commit attribution, branch tracking, worktrees | None |
 | Cost tracking | Running USD cost accumulation | `Usage` in `Result` only |
